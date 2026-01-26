@@ -60,8 +60,8 @@ You can disable any feature during initialization:
 ```javascript
 Nadi.init({
   url: 'https://your-nadi-instance.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  token: 'your-app-token',
+  apiKey: 'your-bearer-token',
   autoSession: false,     // Disable session tracking
   autoVitals: false,      // Disable Web Vitals
   autoErrors: false,      // Disable error tracking

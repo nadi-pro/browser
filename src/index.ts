@@ -26,8 +26,8 @@ export class Nadi {
   private constructor(config: NadiConfig) {
     this.config = {
       url: config.url,
-      appToken: config.appToken,
-      bearerToken: config.bearerToken,
+      apiKey: config.apiKey,
+      token: config.token,
       apiVersion: config.apiVersion || 'v1',
       debug: config.debug || false,
       autoSession: config.autoSession ?? true,
@@ -46,8 +46,8 @@ export class Nadi {
 
     this.session = new SessionManager({
       url: this.config.url,
-      bearerToken: this.config.bearerToken,
-      appToken: this.config.appToken,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
       apiVersion: this.config.apiVersion,
       timeout: this.config.sessionTimeout,
       release: this.config.release,
@@ -56,8 +56,8 @@ export class Nadi {
 
     this.vitals = new VitalsCollector({
       url: this.config.url,
-      bearerToken: this.config.bearerToken,
-      appToken: this.config.appToken,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
       apiVersion: this.config.apiVersion,
       sampleRate: this.config.sampleRate,
       getSessionId: () => this.session.getSessionId(),
@@ -65,8 +65,8 @@ export class Nadi {
 
     this.errors = new ErrorTracker({
       url: this.config.url,
-      bearerToken: this.config.bearerToken,
-      appToken: this.config.appToken,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
       apiVersion: this.config.apiVersion,
       getSessionId: () => this.session.getSessionId(),
       getBreadcrumbs: () => this.breadcrumbs.getAll(),

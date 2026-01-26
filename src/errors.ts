@@ -9,8 +9,8 @@ export class ErrorTracker {
   private enabled: boolean = false;
   private config: {
     url: string;
-    bearerToken: string;
-    appToken: string;
+    apiKey: string;
+    token: string;
     apiVersion: string;
     getSessionId: () => string | undefined;
     getBreadcrumbs: () => Breadcrumb[];
@@ -19,8 +19,8 @@ export class ErrorTracker {
 
   constructor(config: {
     url: string;
-    bearerToken: string;
-    appToken: string;
+    apiKey: string;
+    token: string;
     apiVersion?: string;
     getSessionId: () => string | undefined;
     getBreadcrumbs: () => Breadcrumb[];
@@ -28,8 +28,8 @@ export class ErrorTracker {
   }) {
     this.config = {
       url: config.url,
-      bearerToken: config.bearerToken,
-      appToken: config.appToken,
+      apiKey: config.apiKey,
+      token: config.token,
       apiVersion: config.apiVersion || 'v1',
       getSessionId: config.getSessionId,
       getBreadcrumbs: config.getBreadcrumbs,
@@ -189,8 +189,8 @@ export class ErrorTracker {
 
     const url = buildUrl(this.config.url, '/api/rum/errors');
     const headers = createHeaders(
-      this.config.bearerToken,
-      this.config.appToken,
+      this.config.apiKey,
+      this.config.token,
       this.config.apiVersion
     );
 

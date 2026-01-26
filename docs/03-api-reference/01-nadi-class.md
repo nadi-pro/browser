@@ -25,8 +25,8 @@ static init(config: NadiConfig): Nadi
 ```javascript
 const nadi = Nadi.init({
   url: 'https://nadi.example.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  token: 'your-app-token',
+  apiKey: 'your-bearer-token',
   release: '1.0.0',
   environment: 'production',
 });
@@ -360,8 +360,8 @@ import Nadi from '@nadi/browser';
 // Initialize
 Nadi.init({
   url: 'https://nadi.example.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  token: 'your-app-token',
+  apiKey: 'your-bearer-token',
   release: '2.1.0',
   environment: 'production',
 });

@@ -30,7 +30,7 @@ Complete configuration options and customization.
 Before you begin, ensure you have:
 
 - A Nadi account with an application configured
-- Your application token and bearer token
+- Your application token and API key
 - A web application using modern JavaScript (ES2020+)
 
 ## Browser Support

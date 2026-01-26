@@ -13,8 +13,8 @@ export class VitalsCollector {
   private sent: boolean = false;
   private config: {
     url: string;
-    bearerToken: string;
-    appToken: string;
+    apiKey: string;
+    token: string;
     apiVersion: string;
     sampleRate: number;
     getSessionId: () => string | undefined;
@@ -22,16 +22,16 @@ export class VitalsCollector {
 
   constructor(config: {
     url: string;
-    bearerToken: string;
-    appToken: string;
+    apiKey: string;
+    token: string;
     apiVersion?: string;
     sampleRate?: number;
     getSessionId: () => string | undefined;
   }) {
     this.config = {
       url: config.url,
-      bearerToken: config.bearerToken,
-      appToken: config.appToken,
+      apiKey: config.apiKey,
+      token: config.token,
       apiVersion: config.apiVersion || 'v1',
       sampleRate: config.sampleRate ?? 1.0,
       getSessionId: config.getSessionId,
@@ -146,8 +146,8 @@ export class VitalsCollector {
 
     const url = buildUrl(this.config.url, '/api/rum/vitals');
     const headers = createHeaders(
-      this.config.bearerToken,
-      this.config.appToken,
+      this.config.apiKey,
+      this.config.token,
       this.config.apiVersion
     );
 

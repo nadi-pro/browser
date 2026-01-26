@@ -29,8 +29,8 @@ import Nadi from '@nadi/browser';
 
 const nadi = Nadi.init({
   url: 'https://nadi.example.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  token: 'your-app-token',
+  apiKey: 'your-bearer-token',
 });
 ```
 

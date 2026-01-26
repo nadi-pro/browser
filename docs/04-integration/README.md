@@ -28,8 +28,8 @@ For any framework, the integration follows this pattern:
 // 1. Initialize early in app lifecycle
 Nadi.init({
   url: process.env.NADI_URL,
-  appToken: process.env.NADI_APP_TOKEN,
-  bearerToken: process.env.NADI_BEARER_TOKEN,
+  token: process.env.NADI_TOKEN,
+  apiKey: process.env.NADI_API_KEY,
   release: process.env.APP_VERSION,
   environment: process.env.NODE_ENV,
 });
@@ -57,8 +57,8 @@ All frameworks require environment variables:
 | Variable | Description |
 |----------|-------------|
 | `NADI_URL` | Nadi instance URL |
-| `NADI_APP_TOKEN` | Application token |
-| `NADI_BEARER_TOKEN` | Bearer token |
+| `NADI_TOKEN` | Application identifier token |
+| `NADI_API_KEY` | API Key |
 | `APP_VERSION` | Your app version |
 
 ## Framework Comparison

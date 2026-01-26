@@ -11,11 +11,11 @@ interface NadiConfig {
   /** Nadi API endpoint URL */
   url: string;
 
-  /** Application token for authentication */
-  appToken: string;
+  /** Application identifier token for authentication */
+  token: string;
 
-  /** Sanctum bearer token */
-  bearerToken: string;
+  /** Sanctum API key */
+  apiKey: string;
 
   /** API version (default: 'v1') */
   apiVersion?: string;
@@ -59,8 +59,8 @@ import { NadiConfig } from '@nadi/browser';
 
 const config: NadiConfig = {
   url: 'https://nadi.example.com',
-  appToken: 'app-token',
-  bearerToken: 'bearer-token',
+  token: 'app-token',
+  apiKey: 'bearer-token',
   release: '1.0.0',
   environment: 'production',
 };

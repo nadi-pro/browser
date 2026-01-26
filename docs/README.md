@@ -37,8 +37,8 @@ import Nadi from '@nadi/browser';
 
 Nadi.init({
   url: 'https://your-nadi-instance.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  token: 'your-app-token',
+  apiKey: 'your-bearer-token',
 });
 ```
 

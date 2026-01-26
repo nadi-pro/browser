@@ -4,10 +4,10 @@
 export interface NadiConfig {
   /** Nadi API endpoint URL */
   url: string;
-  /** Application token for authentication */
-  appToken: string;
-  /** Sanctum bearer token */
-  bearerToken: string;
+  /** Sanctum personal access token for authentication */
+  apiKey: string;
+  /** Application identifier token from Nadi dashboard */
+  token: string;
   /** API version (default: 'v1') */
   apiVersion?: string;
   /** Enable debug logging */

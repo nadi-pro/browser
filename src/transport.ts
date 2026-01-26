@@ -31,15 +31,18 @@ export function send(options: TransportOptions): Promise<boolean> {
 
 /**
  * Create headers for Nadi API requests
+ * @param apiKey - Sanctum personal access token for authentication
+ * @param token - Application identifier token from Nadi dashboard
+ * @param apiVersion - API version (default: 'v1')
  */
 export function createHeaders(
-  bearerToken: string,
-  appToken: string,
+  apiKey: string,
+  token: string,
   apiVersion: string = 'v1'
 ): Record<string, string> {
   return {
-    Authorization: `Bearer ${bearerToken}`,
-    'Nadi-App-Token': appToken,
+    Authorization: `Bearer ${apiKey}`,
+    'Nadi-App-Token': token,
     'X-API-Version': apiVersion,
     'Content-Type': 'application/json',
   };

@@ -21,8 +21,8 @@ fetch(url, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${bearerToken}`,
-    'Nadi-App-Token': appToken,
+    'Authorization': `Bearer ${apiKey}`,
+    'Nadi-App-Token': token,
     'X-API-Version': apiVersion,
   },
   body: JSON.stringify(data),
@@ -49,7 +49,7 @@ All requests include these headers:
 | Header | Value | Description |
 |--------|-------|-------------|
 | `Authorization` | `Bearer {token}` | Sanctum auth token |
-| `Nadi-App-Token` | `{appToken}` | Application identifier |
+| `Nadi-App-Token` | `{token}` | Application identifier |
 | `X-API-Version` | `v1` | API version |
 | `Content-Type` | `application/json` | Payload format |
 

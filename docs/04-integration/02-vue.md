@@ -23,8 +23,8 @@ export default {
     // Initialize SDK
     Nadi.init({
       url: options.url || import.meta.env.VITE_NADI_URL,
-      appToken: options.appToken || import.meta.env.VITE_NADI_APP_TOKEN,
-      bearerToken: options.bearerToken || import.meta.env.VITE_NADI_BEARER_TOKEN,
+      token: options.token || import.meta.env.VITE_NADI_TOKEN,
+      apiKey: options.apiKey || import.meta.env.VITE_NADI_API_KEY,
       release: options.release || import.meta.env.VITE_APP_VERSION,
       environment: options.environment || import.meta.env.MODE,
       debug: import.meta.env.DEV,
@@ -62,8 +62,8 @@ const app = createApp(App);
 
 app.use(nadiPlugin, {
   url: import.meta.env.VITE_NADI_URL,
-  appToken: import.meta.env.VITE_NADI_APP_TOKEN,
-  bearerToken: import.meta.env.VITE_NADI_BEARER_TOKEN,
+  token: import.meta.env.VITE_NADI_TOKEN,
+  apiKey: import.meta.env.VITE_NADI_API_KEY,
 });
 
 app.use(router);
@@ -82,8 +82,8 @@ export default {
   install(Vue, options) {
     Nadi.init({
       url: options.url || process.env.VUE_APP_NADI_URL,
-      appToken: options.appToken || process.env.VUE_APP_NADI_APP_TOKEN,
-      bearerToken: options.bearerToken || process.env.VUE_APP_NADI_BEARER_TOKEN,
+      token: options.token || process.env.VUE_APP_NADI_TOKEN,
+      apiKey: options.apiKey || process.env.VUE_APP_NADI_API_KEY,
       release: options.release || process.env.VUE_APP_VERSION,
       environment: process.env.NODE_ENV,
     });
@@ -321,8 +321,8 @@ export const useNadiStore = defineStore('nadi', {
 
 ```env
 VITE_NADI_URL=https://nadi.example.com
-VITE_NADI_APP_TOKEN=your-app-token
-VITE_NADI_BEARER_TOKEN=your-bearer-token
+VITE_NADI_TOKEN=your-app-token
+VITE_NADI_API_KEY=your-bearer-token
 VITE_APP_VERSION=1.0.0
 ```
 
@@ -330,8 +330,8 @@ VITE_APP_VERSION=1.0.0
 
 ```env
 VUE_APP_NADI_URL=https://nadi.example.com
-VUE_APP_NADI_APP_TOKEN=your-app-token
-VUE_APP_NADI_BEARER_TOKEN=your-bearer-token
+VUE_APP_NADI_TOKEN=your-app-token
+VUE_APP_NADI_API_KEY=your-bearer-token
 VUE_APP_VERSION=1.0.0
 ```
 

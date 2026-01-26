@@ -26,8 +26,8 @@ export function initNadi() {
 
   Nadi.init({
     url: process.env.REACT_APP_NADI_URL,
-    appToken: process.env.REACT_APP_NADI_APP_TOKEN,
-    bearerToken: process.env.REACT_APP_NADI_BEARER_TOKEN,
+    token: process.env.REACT_APP_NADI_TOKEN,
+    apiKey: process.env.REACT_APP_NADI_API_KEY,
     release: process.env.REACT_APP_VERSION,
     environment: process.env.NODE_ENV,
     debug: process.env.NODE_ENV === 'development',
@@ -64,8 +64,8 @@ import Nadi from '@nadi/browser';
 export function initNadi() {
   Nadi.init({
     url: import.meta.env.VITE_NADI_URL,
-    appToken: import.meta.env.VITE_NADI_APP_TOKEN,
-    bearerToken: import.meta.env.VITE_NADI_BEARER_TOKEN,
+    token: import.meta.env.VITE_NADI_TOKEN,
+    apiKey: import.meta.env.VITE_NADI_API_KEY,
     release: import.meta.env.VITE_APP_VERSION,
     environment: import.meta.env.MODE,
   });
@@ -284,8 +284,8 @@ export function useNadi() {
 
 ```env
 REACT_APP_NADI_URL=https://nadi.example.com
-REACT_APP_NADI_APP_TOKEN=your-app-token
-REACT_APP_NADI_BEARER_TOKEN=your-bearer-token
+REACT_APP_NADI_TOKEN=your-app-token
+REACT_APP_NADI_API_KEY=your-bearer-token
 REACT_APP_VERSION=1.0.0
 ```
 
@@ -293,8 +293,8 @@ REACT_APP_VERSION=1.0.0
 
 ```env
 VITE_NADI_URL=https://nadi.example.com
-VITE_NADI_APP_TOKEN=your-app-token
-VITE_NADI_BEARER_TOKEN=your-bearer-token
+VITE_NADI_TOKEN=your-app-token
+VITE_NADI_API_KEY=your-bearer-token
 VITE_APP_VERSION=1.0.0
 ```
 

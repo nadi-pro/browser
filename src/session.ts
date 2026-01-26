@@ -10,8 +10,8 @@ export class SessionManager {
   private timeoutId: ReturnType<typeof setTimeout> | null = null;
   private config: {
     url: string;
-    bearerToken: string;
-    appToken: string;
+    apiKey: string;
+    token: string;
     apiVersion: string;
     timeout: number;
     release?: string;
@@ -20,8 +20,8 @@ export class SessionManager {
 
   constructor(config: {
     url: string;
-    bearerToken: string;
-    appToken: string;
+    apiKey: string;
+    token: string;
     apiVersion?: string;
     timeout?: number;
     release?: string;
@@ -29,8 +29,8 @@ export class SessionManager {
   }) {
     this.config = {
       url: config.url,
-      bearerToken: config.bearerToken,
-      appToken: config.appToken,
+      apiKey: config.apiKey,
+      token: config.token,
       apiVersion: config.apiVersion || 'v1',
       timeout: (config.timeout || 30) * 60 * 1000, // Convert minutes to ms
       release: config.release,
@@ -136,8 +136,8 @@ export class SessionManager {
 
     const url = buildUrl(this.config.url, '/api/sessions/start');
     const headers = createHeaders(
-      this.config.bearerToken,
-      this.config.appToken,
+      this.config.apiKey,
+      this.config.token,
       this.config.apiVersion
     );
 
@@ -166,8 +166,8 @@ export class SessionManager {
 
     const url = buildUrl(this.config.url, '/api/sessions/end');
     const headers = createHeaders(
-      this.config.bearerToken,
-      this.config.appToken,
+      this.config.apiKey,
+      this.config.token,
       this.config.apiVersion
     );
 
@@ -189,8 +189,8 @@ export class SessionManager {
 
     const url = buildUrl(this.config.url, '/api/sessions/crash');
     const headers = createHeaders(
-      this.config.bearerToken,
-      this.config.appToken,
+      this.config.apiKey,
+      this.config.token,
       this.config.apiVersion
     );
 

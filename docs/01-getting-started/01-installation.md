@@ -36,8 +36,8 @@ The SDK will be available globally as `Nadi`:
 <script>
   Nadi.init({
     url: 'https://your-nadi-instance.com',
-    appToken: 'your-app-token',
-    bearerToken: 'your-bearer-token',
+    token: 'your-app-token',
+    apiKey: 'your-bearer-token',
   });
 </script>
 ```
@@ -63,8 +63,8 @@ import Nadi, { NadiConfig, VitalMetric } from '@nadi/browser';
 
 const config: NadiConfig = {
   url: 'https://your-nadi-instance.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  token: 'your-app-token',
+  apiKey: 'your-bearer-token',
 };
 
 Nadi.init(config);
