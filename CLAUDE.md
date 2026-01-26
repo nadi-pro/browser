@@ -108,7 +108,7 @@ All requests include:
 ```
 Authorization: Bearer {bearerToken}
 Nadi-App-Token: {appToken}
-X-API-Version: v1
+Nadi-API-Version: v1
 Content-Type: application/json
 ```
 

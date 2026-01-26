@@ -23,7 +23,7 @@ fetch(url, {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${apiKey}`,
     'Nadi-App-Token': token,
-    'X-API-Version': apiVersion,
+    'Nadi-API-Version': apiVersion,
   },
   body: JSON.stringify(data),
   keepalive: true,
@@ -50,7 +50,7 @@ All requests include these headers:
 |--------|-------|-------------|
 | `Authorization` | `Bearer {token}` | Sanctum auth token |
 | `Nadi-App-Token` | `{token}` | Application identifier |
-| `X-API-Version` | `v1` | API version |
+| `Nadi-API-Version` | `v1` | API version |
 | `Content-Type` | `application/json` | Payload format |
 
 ## Request Payload Sizes
@@ -126,7 +126,7 @@ Ensure your Nadi instance allows requests from your domain:
     'Content-Type',
     'Authorization',
     'Nadi-App-Token',
-    'X-API-Version',
+    'Nadi-API-Version',
 ],
 ```
 

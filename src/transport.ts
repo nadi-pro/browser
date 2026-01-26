@@ -43,7 +43,7 @@ export function createHeaders(
   return {
     Authorization: `Bearer ${apiKey}`,
     'Nadi-App-Token': token,
-    'X-API-Version': apiVersion,
+    'Nadi-API-Version': apiVersion,
     'Content-Type': 'application/json',
   };
 }
