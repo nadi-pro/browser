@@ -1,0 +1,66 @@
+{
+  "name": "@nadi/browser",
+  "version": "1.0.0",
+  "description": "Nadi JavaScript SDK for browser monitoring - Web Vitals, error tracking, and session management",
+  "main": "dist/nadi.cjs.js",
+  "module": "dist/nadi.esm.js",
+  "browser": "dist/nadi.umd.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/nadi.esm.js",
+      "require": "./dist/nadi.cjs.js",
+      "browser": "./dist/nadi.umd.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .js,.ts",
+    "format": "prettier --write src/**/*.{js,ts}",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cleaniquecoders/nadi-js.git"
+  },
+  "keywords": [
+    "nadi",
+    "monitoring",
+    "web-vitals",
+    "error-tracking",
+    "rum",
+    "real-user-monitoring",
+    "performance",
+    "observability"
+  ],
+  "author": "Cleanigue Coders",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cleaniquecoders/nadi-js/issues"
+  },
+  "homepage": "https://github.com/cleaniquecoders/nadi-js#readme",
+  "dependencies": {
+    "web-vitals": "^4.2.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.4",
+    "rollup": "^4.9.6",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
