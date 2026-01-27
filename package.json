@@ -1,5 +1,5 @@
 {
-  "name": "@nadi/browser",
+  "name": "@nadi-pro/browser",
   "version": "1.0.0",
   "description": "Nadi JavaScript SDK for browser monitoring - Web Vitals, error tracking, and session management",
   "main": "dist/nadi.cjs.js",
@@ -47,6 +47,7 @@
   },
   "homepage": "https://github.com/cleaniquecoders/nadi-js#readme",
   "dependencies": {
+    "tslib": "^2.8.1",
     "web-vitals": "^4.2.0"
   },
   "devDependencies": {

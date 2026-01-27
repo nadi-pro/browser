@@ -71,8 +71,8 @@ export function getOSInfo(): { name: string; version: string } {
     const match = ua.match(/Android (\d+)/);
     return { name: 'Android', version: match ? match[1] : '' };
   }
-  if (/iPhone OS (\d+)/.test(ua)) {
-    const match = ua.match(/iPhone OS (\d+)/);
+  if (/iPhone OS (\d+)/.test(ua) || /CPU OS (\d+)/.test(ua)) {
+    const match = ua.match(/(?:iPhone OS|CPU OS) (\d+)/);
     return { name: 'iOS', version: match ? match[1] : '' };
   }
   if (/Linux/.test(ua)) return { name: 'Linux', version: '' };

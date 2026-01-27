@@ -1,4 +1,4 @@
-# @nadi/browser
+# @nadi-pro/browser
 
 JavaScript SDK for Nadi - Real User Monitoring (RUM) for web applications.
 
@@ -13,17 +13,17 @@ JavaScript SDK for Nadi - Real User Monitoring (RUM) for web applications.
 ## Installation
 
 ```bash
-npm install @nadi/browser
+npm install @nadi-pro/browser
 # or
-yarn add @nadi/browser
+yarn add @nadi-pro/browser
 # or
-pnpm add @nadi/browser
+pnpm add @nadi-pro/browser
 ```
 
 ## Quick Start
 
 ```javascript
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 // Initialize the SDK
 Nadi.init({
@@ -161,7 +161,7 @@ await nadi.stop();
 ## CDN Usage
 
 ```html
-<script src="https://unpkg.com/@nadi/browser/dist/nadi.umd.js"></script>
+<script src="https://unpkg.com/@nadi-pro/browser/dist/nadi.umd.js"></script>
 <script>
   Nadi.init({
     url: 'https://your-nadi-instance.com',
@@ -177,7 +177,7 @@ await nadi.stop();
 
 ```javascript
 // src/nadi.js
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export const initNadi = () => {
   Nadi.init({
@@ -197,7 +197,7 @@ initNadi();
 
 ```javascript
 // src/plugins/nadi.js
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export default {
   install() {
@@ -221,7 +221,7 @@ app.use(nadiPlugin);
 // lib/nadi.js
 'use client';
 
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 let initialized = false;
 

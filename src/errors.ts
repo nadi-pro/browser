@@ -1,6 +1,6 @@
-import type { ErrorPayload, Breadcrumb } from './types';
+import type { ErrorPayload, Breadcrumb, DeviceInfo } from './types';
 import { send, createHeaders, buildUrl } from './transport';
-import { getPageUrl } from './utils';
+import { getPageUrl, getDeviceInfo } from './utils';
 
 /**
  * Error tracker for capturing JavaScript errors
@@ -187,12 +187,14 @@ export class ErrorTracker {
       this.config.onError(payload);
     }
 
-    const url = buildUrl(this.config.url, '/api/rum/errors');
+    const url = buildUrl(this.config.url, '/rum/errors');
     const headers = createHeaders(
       this.config.apiKey,
       this.config.token,
       this.config.apiVersion
     );
+
+    const deviceInfo = getDeviceInfo();
 
     await send({
       url,
@@ -208,6 +210,16 @@ export class ErrorTracker {
         page_url: payload.pageUrl,
         user_agent: payload.userAgent,
         breadcrumbs: payload.breadcrumbs,
+        device_info: {
+          browser: deviceInfo.browser,
+          browser_version: deviceInfo.browserVersion,
+          os: deviceInfo.os,
+          os_version: deviceInfo.osVersion,
+          device_type: deviceInfo.deviceType,
+          connection_type: deviceInfo.connectionType,
+          screen_width: deviceInfo.screenWidth,
+          screen_height: deviceInfo.screenHeight,
+        },
       },
     });
   }

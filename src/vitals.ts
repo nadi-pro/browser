@@ -144,7 +144,7 @@ export class VitalsCollector {
       deviceInfo: this.formatDeviceInfo(deviceInfo),
     };
 
-    const url = buildUrl(this.config.url, '/api/rum/vitals');
+    const url = buildUrl(this.config.url, '/rum/vitals');
     const headers = createHeaders(
       this.config.apiKey,
       this.config.token,

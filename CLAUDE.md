@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-nadi-js is the official JavaScript/TypeScript SDK for Nadi - a Real User Monitoring (RUM) library for web applications. It provides browser-side monitoring including Core Web Vitals, session tracking, error capture, and user action breadcrumbs.
+`@nadi-pro/browser` is the official JavaScript/TypeScript SDK for Nadi - a Real User Monitoring (RUM) library for web applications. It provides browser-side monitoring including Core Web Vitals, session tracking, error capture, and user action breadcrumbs.
 
 ## Technology Stack
 

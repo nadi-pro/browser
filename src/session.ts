@@ -134,7 +134,7 @@ export class SessionManager {
   private async sendSessionStart(): Promise<void> {
     if (!this.session) return;
 
-    const url = buildUrl(this.config.url, '/api/sessions/start');
+    const url = buildUrl(this.config.url, '/sessions/start');
     const headers = createHeaders(
       this.config.apiKey,
       this.config.token,
@@ -164,7 +164,7 @@ export class SessionManager {
   private async sendSessionEnd(): Promise<void> {
     if (!this.session) return;
 
-    const url = buildUrl(this.config.url, '/api/sessions/end');
+    const url = buildUrl(this.config.url, '/sessions/end');
     const headers = createHeaders(
       this.config.apiKey,
       this.config.token,
@@ -187,7 +187,7 @@ export class SessionManager {
   private async sendSessionCrash(): Promise<void> {
     if (!this.session) return;
 
-    const url = buildUrl(this.config.url, '/api/sessions/crash');
+    const url = buildUrl(this.config.url, '/sessions/crash');
     const headers = createHeaders(
       this.config.apiKey,
       this.config.token,

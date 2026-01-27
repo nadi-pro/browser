@@ -14,6 +14,13 @@ export default [
       format: 'umd',
       name: 'Nadi',
       sourcemap: true,
+      exports: 'named',
+      // Make Nadi class available directly as window.Nadi
+      footer: `
+        if (typeof window !== 'undefined') {
+          window.Nadi = window.Nadi.Nadi || window.Nadi.default || window.Nadi;
+        }
+      `,
     },
     plugins: [
       resolve({ browser: true }),
