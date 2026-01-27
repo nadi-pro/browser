@@ -3,6 +3,18 @@ import { SessionManager } from './session';
 import { VitalsCollector } from './vitals';
 import { ErrorTracker } from './errors';
 import { BreadcrumbCollector } from './breadcrumbs';
+import { ResourceCollector } from './resources';
+import { LongTaskCollector } from './long-tasks';
+import { PageLoadCollector } from './pageload';
+import { MemoryCollector } from './memory';
+import { InteractionsCollector } from './interactions';
+
+/**
+ * Required config with defaults applied
+ */
+interface ResolvedConfig extends Required<NadiConfig> {
+  // All properties from NadiConfig with defaults applied
+}
 
 /**
  * Nadi Browser SDK
@@ -12,15 +24,27 @@ import { BreadcrumbCollector } from './breadcrumbs';
  * - Core Web Vitals (LCP, INP, CLS, FCP, TTFB)
  * - JavaScript error capture
  * - User action breadcrumbs
+ * - Resource timing (slow assets)
+ * - Long task detection
+ * - Page load waterfall
+ * - Memory monitoring
+ * - Rage click detection
+ * - Custom events/timing
+ * - Scroll depth tracking
  */
 export class Nadi {
   private static instance: Nadi | null = null;
 
-  private config: Required<NadiConfig>;
+  private config: ResolvedConfig;
   private session: SessionManager;
   private vitals: VitalsCollector;
   private errors: ErrorTracker;
   private breadcrumbs: BreadcrumbCollector;
+  private resources: ResourceCollector;
+  private longTasks: LongTaskCollector;
+  private pageLoad: PageLoadCollector;
+  private memory: MemoryCollector;
+  private interactions: InteractionsCollector;
   private initialized: boolean = false;
 
   private constructor(config: NadiConfig) {
@@ -39,6 +63,22 @@ export class Nadi {
       release: config.release || '',
       environment: config.environment || 'production',
       sampleRate: config.sampleRate ?? 1.0,
+      // Phase 1 features
+      resourceTracking: config.resourceTracking ?? true,
+      resourceThresholdMs: config.resourceThresholdMs ?? 500,
+      longTaskTracking: config.longTaskTracking ?? true,
+      longTaskThresholdMs: config.longTaskThresholdMs ?? 50,
+      // Phase 2 features
+      rageClickDetection: config.rageClickDetection ?? true,
+      rageClickThreshold: config.rageClickThreshold ?? 3,
+      rageClickWindowMs: config.rageClickWindowMs ?? 1000,
+      networkRequestTracking: config.networkRequestTracking ?? true,
+      networkRequestThresholdMs: config.networkRequestThresholdMs ?? 1000,
+      memoryTracking: config.memoryTracking ?? false,
+      memorySampleIntervalMs: config.memorySampleIntervalMs ?? 30000,
+      scrollDepthTracking: config.scrollDepthTracking ?? false,
+      firstPartyDomains: config.firstPartyDomains ?? [],
+      pageLoadTracking: config.pageLoadTracking ?? true,
     };
 
     // Initialize components
@@ -71,9 +111,54 @@ export class Nadi {
       getSessionId: () => this.session.getSessionId(),
       getBreadcrumbs: () => this.breadcrumbs.getAll(),
       onError: () => {
-        // Record error as breadcrumb
         this.breadcrumbs.add('error', 'Error captured');
       },
+    });
+
+    this.resources = new ResourceCollector({
+      url: this.config.url,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
+      apiVersion: this.config.apiVersion,
+      thresholdMs: this.config.resourceThresholdMs,
+      getSessionId: () => this.session.getSessionId(),
+    });
+
+    this.longTasks = new LongTaskCollector({
+      url: this.config.url,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
+      apiVersion: this.config.apiVersion,
+      thresholdMs: this.config.longTaskThresholdMs,
+      getSessionId: () => this.session.getSessionId(),
+    });
+
+    this.pageLoad = new PageLoadCollector({
+      url: this.config.url,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
+      apiVersion: this.config.apiVersion,
+      getSessionId: () => this.session.getSessionId(),
+    });
+
+    this.memory = new MemoryCollector({
+      url: this.config.url,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
+      apiVersion: this.config.apiVersion,
+      sampleIntervalMs: this.config.memorySampleIntervalMs,
+      getSessionId: () => this.session.getSessionId(),
+    });
+
+    this.interactions = new InteractionsCollector({
+      url: this.config.url,
+      apiKey: this.config.apiKey,
+      token: this.config.token,
+      apiVersion: this.config.apiVersion,
+      rageClickThreshold: this.config.rageClickThreshold,
+      rageClickWindowMs: this.config.rageClickWindowMs,
+      scrollDepthTracking: this.config.scrollDepthTracking,
+      getSessionId: () => this.session.getSessionId(),
     });
 
     this.log('Nadi SDK initialized', this.config);
@@ -130,6 +215,36 @@ export class Nadi {
       this.errors.start();
       this.log('Error tracking started');
     }
+
+    // Start resource timing tracking
+    if (this.config.resourceTracking) {
+      this.resources.start();
+      this.log('Resource timing collection started');
+    }
+
+    // Start long task tracking
+    if (this.config.longTaskTracking) {
+      this.longTasks.start();
+      this.log('Long task collection started');
+    }
+
+    // Start page load tracking
+    if (this.config.pageLoadTracking) {
+      this.pageLoad.start();
+      this.log('Page load collection started');
+    }
+
+    // Start memory tracking (Chrome only)
+    if (this.config.memoryTracking && MemoryCollector.isSupported()) {
+      this.memory.start();
+      this.log('Memory tracking started');
+    }
+
+    // Start interactions (rage clicks, scroll depth)
+    if (this.config.rageClickDetection || this.config.scrollDepthTracking) {
+      this.interactions.start();
+      this.log('Interactions collection started');
+    }
   }
 
   /**
@@ -139,6 +254,11 @@ export class Nadi {
     this.breadcrumbs.stop();
     this.vitals.stop();
     this.errors.stop();
+    this.resources.stop();
+    this.longTasks.stop();
+    this.pageLoad.stop();
+    this.memory.stop();
+    this.interactions.stop();
     await this.session.end();
     this.initialized = false;
     this.log('Nadi SDK stopped');
@@ -245,6 +365,50 @@ export class Nadi {
   }
 
   // ==================
+  // Custom Event Methods
+  // ==================
+
+  /**
+   * Track a custom event
+   */
+  trackEvent(
+    name: string,
+    category?: string,
+    value?: number,
+    tags?: Record<string, string>
+  ): void {
+    this.interactions.trackEvent(name, category, value, tags);
+    this.log('Event tracked', { name, category, value, tags });
+  }
+
+  /**
+   * Track a timing event
+   */
+  trackTiming(name: string, duration: number, tags?: Record<string, string>): void {
+    this.interactions.trackTiming(name, duration, tags);
+    this.log('Timing tracked', { name, duration, tags });
+  }
+
+  // ==================
+  // Flush Methods
+  // ==================
+
+  /**
+   * Flush all collected data immediately
+   */
+  async flush(): Promise<void> {
+    await Promise.all([
+      this.vitals.flush(),
+      this.resources.flush(),
+      this.longTasks.flush(),
+      this.pageLoad.flush(),
+      this.memory.flush(),
+      this.interactions.flush(),
+    ]);
+    this.log('All data flushed');
+  }
+
+  // ==================
   // Utility Methods
   // ==================
 
@@ -268,6 +432,15 @@ export type {
   DeviceInfo,
   ErrorPayload,
   VitalsPayload,
+  ResourceEntry,
+  LongTaskEntry,
+  CustomEventEntry,
+  RageClickEntry,
+  NetworkRequestEntry,
+  PageLoadEntry,
+  MemorySampleEntry,
+  UserInteractionEntry,
+  InteractionType,
 } from './types';
 
 // Export utilities for advanced usage
