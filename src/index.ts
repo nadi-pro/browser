@@ -1,4 +1,4 @@
-import type { NadiConfig, Breadcrumb, BreadcrumbType, SessionData, VitalMetric } from './types';
+import type { NadiConfig, Breadcrumb, BreadcrumbType, SessionData, VitalMetric, TraceContext } from './types';
 import { SessionManager } from './session';
 import { VitalsCollector } from './vitals';
 import { ErrorTracker } from './errors';
@@ -8,12 +8,18 @@ import { LongTaskCollector } from './long-tasks';
 import { PageLoadCollector } from './pageload';
 import { MemoryCollector } from './memory';
 import { InteractionsCollector } from './interactions';
+import { TracingManager } from './tracing';
+import { PrivacyManager } from './privacy';
+import { SamplingManager, type SamplingContext } from './sampling';
 
 /**
  * Required config with defaults applied
  */
-interface ResolvedConfig extends Required<NadiConfig> {
+interface ResolvedConfig extends Required<Omit<NadiConfig, 'propagateTraceUrls' | 'customPIIPatterns' | 'samplingRules'>> {
   // All properties from NadiConfig with defaults applied
+  propagateTraceUrls: (string | RegExp)[];
+  customPIIPatterns: Record<string, RegExp>;
+  samplingRules: NadiConfig['samplingRules'];
 }
 
 /**
@@ -45,7 +51,11 @@ export class Nadi {
   private pageLoad: PageLoadCollector;
   private memory: MemoryCollector;
   private interactions: InteractionsCollector;
+  private tracing: TracingManager;
+  private privacy: PrivacyManager;
+  private sampling: SamplingManager;
   private initialized: boolean = false;
+  private pageLoadTime: number = 0;
 
   private constructor(config: NadiConfig) {
     this.config = {
@@ -79,10 +89,75 @@ export class Nadi {
       scrollDepthTracking: config.scrollDepthTracking ?? false,
       firstPartyDomains: config.firstPartyDomains ?? [],
       pageLoadTracking: config.pageLoadTracking ?? true,
+      // Phase 3: Distributed Tracing
+      tracingEnabled: config.tracingEnabled ?? false,
+      propagateTraceUrls: config.propagateTraceUrls ?? [],
+      traceState: config.traceState ?? '',
+      // Phase 3: Privacy & Data Masking
+      privacyEnabled: config.privacyEnabled ?? true,
+      sensitiveUrlParams: config.sensitiveUrlParams ?? [],
+      maskingStrategy: config.maskingStrategy ?? 'redact',
+      customPIIPatterns: config.customPIIPatterns ?? {},
+      sensitiveFields: config.sensitiveFields ?? [],
+      // Phase 3: Advanced Sampling
+      samplingRules: config.samplingRules,
+      alwaysSampleErrors: config.alwaysSampleErrors ?? true,
+      alwaysSampleSlowSessions: config.alwaysSampleSlowSessions ?? true,
+      slowSessionThresholdMs: config.slowSessionThresholdMs ?? 5000,
+      adaptiveSampling: config.adaptiveSampling ?? false,
     };
 
+    // Initialize tracing manager
+    this.tracing = new TracingManager({
+      enabled: this.config.tracingEnabled,
+      propagateTraceUrls: this.config.propagateTraceUrls,
+      traceState: this.config.traceState,
+    });
+
+    // Initialize privacy manager
+    this.privacy = new PrivacyManager({
+      enabled: this.config.privacyEnabled,
+      sensitiveUrlParams: this.config.sensitiveUrlParams,
+      maskingStrategy: this.config.maskingStrategy,
+      customPIIPatterns: this.config.customPIIPatterns,
+      sensitiveFields: this.config.sensitiveFields,
+    });
+
+    // Initialize sampling manager
+    this.sampling = new SamplingManager({
+      globalRate: this.config.sampleRate,
+      rules: this.config.samplingRules?.map((rule) => ({
+        name: rule.name,
+        rate: rule.rate,
+        priority: rule.priority,
+        match: (ctx: SamplingContext) => {
+          if (!rule.conditions) return true;
+          const { routes, deviceTypes, connectionTypes } = rule.conditions;
+          if (routes && routes.length > 0) {
+            if (!ctx.route || !routes.some((r) => ctx.route?.startsWith(r))) return false;
+          }
+          if (deviceTypes && deviceTypes.length > 0) {
+            if (!ctx.deviceType || !deviceTypes.includes(ctx.deviceType)) return false;
+          }
+          if (connectionTypes && connectionTypes.length > 0) {
+            if (!ctx.connectionType || !connectionTypes.includes(ctx.connectionType)) return false;
+          }
+          return true;
+        },
+      })),
+      alwaysSampleErrors: this.config.alwaysSampleErrors,
+      alwaysSampleSlowSessions: this.config.alwaysSampleSlowSessions,
+      slowSessionThresholdMs: this.config.slowSessionThresholdMs,
+      adaptiveSampling: this.config.adaptiveSampling,
+    });
+
     // Initialize components
-    this.breadcrumbs = new BreadcrumbCollector(this.config.maxBreadcrumbs);
+    this.breadcrumbs = new BreadcrumbCollector({
+      maxBreadcrumbs: this.config.maxBreadcrumbs,
+      getTraceHeaders: (url) => this.tracing.getTraceHeaders(url),
+      scrubUrl: (url) => this.privacy.scrubUrl(url),
+      maskPII: (text) => this.privacy.maskPII(text),
+    });
 
     this.session = new SessionManager({
       url: this.config.url,
@@ -108,10 +183,15 @@ export class Nadi {
       apiKey: this.config.apiKey,
       token: this.config.token,
       apiVersion: this.config.apiVersion,
+      release: this.config.release,
       getSessionId: () => this.session.getSessionId(),
       getBreadcrumbs: () => this.breadcrumbs.getAll(),
+      getTraceContext: () => this.tracing.isEnabled() ? this.tracing.getContext() : undefined,
+      maskError: (message, stack) => this.privacy.maskError(message, stack),
       onError: () => {
         this.breadcrumbs.add('error', 'Error captured');
+        // Force session to be sampled when an error occurs
+        this.sampling.forceSampleSession();
       },
     });
 
@@ -409,6 +489,100 @@ export class Nadi {
   }
 
   // ==================
+  // Tracing Methods
+  // ==================
+
+  /**
+   * Get current trace context
+   */
+  getTraceContext(): TraceContext | null {
+    if (!this.tracing.isEnabled()) return null;
+    return this.tracing.getContext();
+  }
+
+  /**
+   * Get the current trace ID
+   */
+  getTraceId(): string | null {
+    if (!this.tracing.isEnabled()) return null;
+    return this.tracing.getTraceId();
+  }
+
+  /**
+   * Get trace headers for an outgoing request
+   * @param url The target URL
+   */
+  getTraceHeaders(url: string): Record<string, string> {
+    return this.tracing.getTraceHeaders(url);
+  }
+
+  /**
+   * Adopt an existing trace context (e.g., from server-rendered page)
+   */
+  adoptTraceContext(context: TraceContext): void {
+    this.tracing.adoptContext(context);
+    this.log('Trace context adopted', context);
+  }
+
+  // ==================
+  // Privacy Methods
+  // ==================
+
+  /**
+   * Scrub PII from a URL
+   */
+  scrubUrl(url: string): string {
+    return this.privacy.scrubUrl(url);
+  }
+
+  /**
+   * Mask PII in text
+   */
+  maskPII(text: string): string {
+    return this.privacy.maskPII(text);
+  }
+
+  /**
+   * Detect PII in text
+   */
+  detectPII(text: string): { hasPII: boolean; types: string[]; count: number } {
+    return this.privacy.detectPII(text);
+  }
+
+  // ==================
+  // Sampling Methods
+  // ==================
+
+  /**
+   * Check if the current session should be sampled
+   */
+  shouldSampleSession(): boolean {
+    const context = this.getSamplingContext();
+    return this.sampling.shouldSampleSession(context);
+  }
+
+  /**
+   * Get the current sampling decision
+   */
+  getSamplingDecision(): { sampled: boolean; reason: string; rate: number } | null {
+    const decision = this.sampling.getSessionDecision();
+    if (!decision) return null;
+    return {
+      sampled: decision.sampled,
+      reason: decision.reason,
+      rate: decision.appliedRate,
+    };
+  }
+
+  /**
+   * Force the session to be sampled
+   */
+  forceSampleSession(): void {
+    this.sampling.forceSampleSession();
+    this.log('Session sampling forced');
+  }
+
+  // ==================
   // Utility Methods
   // ==================
 
@@ -419,6 +593,28 @@ export class Nadi {
     if (this.config.debug) {
       console.log(`[Nadi] ${message}`, data || '');
     }
+  }
+
+  /**
+   * Get sampling context for current page
+   */
+  private getSamplingContext(): SamplingContext {
+    const deviceInfo = this.session.getSession()?.deviceInfo;
+    return {
+      url: typeof window !== 'undefined' ? window.location.href : '',
+      route: typeof window !== 'undefined' ? window.location.pathname.replace(/\/\d+/g, '/:id') : '',
+      hasError: false,
+      deviceType: deviceInfo?.deviceType,
+      isSlowSession: this.pageLoadTime > this.config.slowSessionThresholdMs,
+      connectionType: deviceInfo?.connectionType,
+    };
+  }
+
+  /**
+   * Set page load time for slow session detection
+   */
+  setPageLoadTime(loadTime: number): void {
+    this.pageLoadTime = loadTime;
   }
 }
 
@@ -441,7 +637,19 @@ export type {
   MemorySampleEntry,
   UserInteractionEntry,
   InteractionType,
+  TraceContext,
+  CorrelatedRequest,
+  SamplingRuleConfig,
 } from './types';
+
+// Export tracing types and utilities
+export { TracingManager, type TracingConfig } from './tracing';
+
+// Export privacy types and utilities
+export { PrivacyManager, type PrivacyConfig, type PIIDetectionResult } from './privacy';
+
+// Export sampling types and utilities
+export { SamplingManager, type SamplingConfig, type SamplingContext, type SamplingDecision, type SamplingRule } from './sampling';
 
 // Export utilities for advanced usage
 export { getDeviceInfo, getPageUrl, getRoutePattern } from './utils';

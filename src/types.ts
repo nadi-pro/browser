@@ -1,4 +1,58 @@
 /**
+ * Trace context for distributed tracing
+ */
+export interface TraceContext {
+  /** 32 hex character trace ID */
+  traceId: string;
+  /** 16 hex character span ID */
+  spanId: string;
+  /** Whether the trace is sampled */
+  sampled: boolean;
+  /** Trace state (vendor-specific key-value pairs) */
+  traceState?: string;
+}
+
+/**
+ * Correlated request for linking frontend events to backend traces
+ */
+export interface CorrelatedRequest {
+  /** Trace ID from the request */
+  traceId: string;
+  /** Span ID from the request */
+  spanId: string;
+  /** Request URL */
+  url: string;
+  /** HTTP method */
+  method: string;
+  /** Start time (performance.now()) */
+  startTime: number;
+  /** End time (performance.now()) */
+  endTime: number;
+  /** HTTP status code */
+  status: number;
+  /** Request duration in ms */
+  duration: number;
+}
+
+/**
+ * Sampling rule for advanced sampling
+ */
+export interface SamplingRuleConfig {
+  /** Rule name */
+  name: string;
+  /** Sample rate (0-1) */
+  rate: number;
+  /** Priority (higher = evaluated first) */
+  priority: number;
+  /** Conditions for rule matching */
+  conditions?: {
+    routes?: string[];
+    deviceTypes?: string[];
+    connectionTypes?: string[];
+  };
+}
+
+/**
  * Nadi SDK Configuration
  */
 export interface NadiConfig {
@@ -62,6 +116,38 @@ export interface NadiConfig {
   firstPartyDomains?: string[];
   /** Enable page load waterfall tracking (default: true) */
   pageLoadTracking?: boolean;
+
+  // Phase 3: Distributed Tracing
+  /** Enable distributed tracing (default: false) */
+  tracingEnabled?: boolean;
+  /** URLs/patterns to propagate trace headers to */
+  propagateTraceUrls?: (string | RegExp)[];
+  /** Custom trace state to include */
+  traceState?: string;
+
+  // Phase 3: Privacy & Data Masking
+  /** Enable privacy masking (default: true) */
+  privacyEnabled?: boolean;
+  /** URL parameters to always mask */
+  sensitiveUrlParams?: string[];
+  /** Masking strategy: redact, partial, or hash */
+  maskingStrategy?: 'redact' | 'partial' | 'hash';
+  /** Custom PII patterns to detect */
+  customPIIPatterns?: Record<string, RegExp>;
+  /** Fields to always mask in objects */
+  sensitiveFields?: string[];
+
+  // Phase 3: Advanced Sampling
+  /** Custom sampling rules */
+  samplingRules?: SamplingRuleConfig[];
+  /** Always sample sessions with errors (default: true) */
+  alwaysSampleErrors?: boolean;
+  /** Always sample slow sessions (default: true) */
+  alwaysSampleSlowSessions?: boolean;
+  /** Threshold in ms to consider a session slow (default: 5000) */
+  slowSessionThresholdMs?: number;
+  /** Enable adaptive sampling based on error rate */
+  adaptiveSampling?: boolean;
 }
 
 /**
@@ -134,6 +220,10 @@ export interface VitalsPayload {
   route?: string;
   deviceInfo?: Partial<DeviceInfo>;
   countryCode?: string;
+  /** Trace ID for distributed tracing */
+  traceId?: string;
+  /** Span ID for distributed tracing */
+  spanId?: string;
 }
 
 /**
@@ -150,6 +240,14 @@ export interface ErrorPayload {
   pageUrl: string;
   userAgent: string;
   breadcrumbs: Breadcrumb[];
+  /** Trace ID for distributed tracing */
+  traceId?: string;
+  /** Span ID for distributed tracing */
+  spanId?: string;
+  /** Release version for source map resolution */
+  release?: string;
+  /** Correlated API requests that preceded this error */
+  correlatedRequests?: CorrelatedRequest[];
 }
 
 /**
@@ -202,6 +300,10 @@ export interface ResourcePayload {
   }>;
   session_id?: string;
   page_url?: string;
+  /** Trace ID for distributed tracing */
+  trace_id?: string;
+  /** Span ID for distributed tracing */
+  span_id?: string;
 }
 
 /**
@@ -320,9 +422,17 @@ export interface NetworkRequestsPayload {
     is_error?: boolean;
     error_message?: string;
     is_first_party?: boolean;
+    /** Trace ID from request/response headers */
+    trace_id?: string;
+    /** Span ID from request/response headers */
+    span_id?: string;
   }>;
   session_id?: string;
   page_url?: string;
+  /** Trace ID for distributed tracing */
+  trace_id?: string;
+  /** Span ID for distributed tracing */
+  span_id?: string;
 }
 
 /**
@@ -373,6 +483,10 @@ export interface PageLoadPayload {
   connection_type?: string;
   session_id?: string;
   page_url?: string;
+  /** Trace ID for distributed tracing */
+  trace_id?: string;
+  /** Span ID for distributed tracing */
+  span_id?: string;
 }
 
 /**

@@ -28,8 +28,8 @@ import Nadi from '@nadi-pro/browser';
 // Initialize the SDK
 Nadi.init({
   url: 'https://your-nadi-instance.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  apiKey: 'your-sanctum-token',     // Sanctum token for Authorization: Bearer
+  appKey: 'your-application-key',   // Application key for Nadi-App-Token header
   release: '1.0.0',
   environment: 'production',
 });
@@ -47,8 +47,8 @@ That's it! The SDK will automatically:
 Nadi.init({
   // Required
   url: 'https://your-nadi-instance.com',
-  appToken: 'your-app-token',
-  bearerToken: 'your-bearer-token',
+  apiKey: 'your-sanctum-token',     // Sanctum token for Authorization: Bearer
+  appKey: 'your-application-key',   // Application key for Nadi-App-Token header
 
   // Optional
   apiVersion: 'v1',           // API version (default: 'v1')
@@ -165,8 +165,8 @@ await nadi.stop();
 <script>
   Nadi.init({
     url: 'https://your-nadi-instance.com',
-    appToken: 'your-app-token',
-    bearerToken: 'your-bearer-token',
+    apiKey: 'your-sanctum-token',
+    appKey: 'your-application-key',
   });
 </script>
 ```
@@ -182,8 +182,8 @@ import Nadi from '@nadi-pro/browser';
 export const initNadi = () => {
   Nadi.init({
     url: process.env.REACT_APP_NADI_URL,
-    appToken: process.env.REACT_APP_NADI_TOKEN,
-    bearerToken: process.env.REACT_APP_NADI_BEARER,
+    apiKey: process.env.REACT_APP_NADI_API_KEY,
+    appKey: process.env.REACT_APP_NADI_APP_KEY,
     release: process.env.REACT_APP_VERSION,
   });
 };
@@ -203,8 +203,8 @@ export default {
   install() {
     Nadi.init({
       url: import.meta.env.VITE_NADI_URL,
-      appToken: import.meta.env.VITE_NADI_TOKEN,
-      bearerToken: import.meta.env.VITE_NADI_BEARER,
+      apiKey: import.meta.env.VITE_NADI_API_KEY,
+      appKey: import.meta.env.VITE_NADI_APP_KEY,
       release: import.meta.env.VITE_APP_VERSION,
     });
   }
@@ -231,8 +231,8 @@ export function initNadi() {
   initialized = true;
   Nadi.init({
     url: process.env.NEXT_PUBLIC_NADI_URL,
-    appToken: process.env.NEXT_PUBLIC_NADI_TOKEN,
-    bearerToken: process.env.NEXT_PUBLIC_NADI_BEARER,
+    apiKey: process.env.NEXT_PUBLIC_NADI_API_KEY,
+    appKey: process.env.NEXT_PUBLIC_NADI_APP_KEY,
     release: process.env.NEXT_PUBLIC_VERSION,
   });
 }

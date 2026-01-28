@@ -33,7 +33,7 @@ export function initNadi() {
 
   return Nadi.init({
     url: process.env.NEXT_PUBLIC_NADI_URL!,
-    token: process.env.NEXT_PUBLIC_NADI_TOKEN!,
+    appKey: process.env.NEXT_PUBLIC_NADI_APP_KEY!,
     apiKey: process.env.NEXT_PUBLIC_NADI_API_KEY!,
     release: process.env.NEXT_PUBLIC_APP_VERSION,
     environment: process.env.NODE_ENV,
@@ -238,7 +238,7 @@ function initNadi() {
 
   Nadi.init({
     url: process.env.NEXT_PUBLIC_NADI_URL!,
-    token: process.env.NEXT_PUBLIC_NADI_TOKEN!,
+    appKey: process.env.NEXT_PUBLIC_NADI_APP_KEY!,
     apiKey: process.env.NEXT_PUBLIC_NADI_API_KEY!,
     release: process.env.NEXT_PUBLIC_APP_VERSION,
     environment: process.env.NODE_ENV,
@@ -369,8 +369,8 @@ export async function GET() {
 ```env
 # .env.local
 NEXT_PUBLIC_NADI_URL=https://nadi.example.com
-NEXT_PUBLIC_NADI_TOKEN=your-app-token
-NEXT_PUBLIC_NADI_API_KEY=your-bearer-token
+NEXT_PUBLIC_NADI_API_KEY=your-sanctum-token
+NEXT_PUBLIC_NADI_APP_KEY=your-application-key
 NEXT_PUBLIC_APP_VERSION=1.0.0
 ```
 

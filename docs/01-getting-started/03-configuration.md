@@ -8,7 +8,7 @@ Complete reference for all configuration options available when initializing the
 interface NadiConfig {
   // Required
   url: string;
-  token: string;
+  appKey: string;
   apiKey: string;
 
   // Optional
@@ -42,16 +42,16 @@ Nadi.init({
 });
 ```
 
-### token
+### appKey
 
 - **Type**: `string`
 - **Required**: Yes
 
-Your application token from the Nadi dashboard. Used to identify which application is sending data.
+Your application key from the Nadi dashboard. Used to identify which application is sending data (sent as `Nadi-App-Token` header).
 
 ```javascript
 Nadi.init({
-  token: 'app_abc123xyz',
+  appKey: 'your-application-key',
   // ...
 });
 ```
@@ -233,7 +233,7 @@ A common pattern is to use environment variables for configuration:
 ```javascript
 Nadi.init({
   url: process.env.NADI_URL,
-  token: process.env.NADI_TOKEN,
+  appKey: process.env.NADI_APP_KEY,
   apiKey: process.env.NADI_API_KEY,
   release: process.env.APP_VERSION,
   environment: process.env.NODE_ENV,
@@ -246,7 +246,7 @@ Nadi.init({
 ```javascript
 Nadi.init({
   url: import.meta.env.VITE_NADI_URL,
-  token: import.meta.env.VITE_NADI_TOKEN,
+  appKey: import.meta.env.VITE_NADI_APP_KEY,
   apiKey: import.meta.env.VITE_NADI_API_KEY,
 });
 ```
@@ -256,7 +256,7 @@ Nadi.init({
 ```javascript
 Nadi.init({
   url: process.env.REACT_APP_NADI_URL,
-  token: process.env.REACT_APP_NADI_TOKEN,
+  appKey: process.env.REACT_APP_NADI_APP_KEY,
   apiKey: process.env.REACT_APP_NADI_API_KEY,
 });
 ```
@@ -266,7 +266,7 @@ Nadi.init({
 ```javascript
 Nadi.init({
   url: process.env.NEXT_PUBLIC_NADI_URL,
-  token: process.env.NEXT_PUBLIC_NADI_TOKEN,
+  appKey: process.env.NEXT_PUBLIC_NADI_APP_KEY,
   apiKey: process.env.NEXT_PUBLIC_NADI_API_KEY,
 });
 ```
@@ -278,7 +278,7 @@ Nadi.init({
 ```javascript
 Nadi.init({
   url: 'https://nadi.example.com',
-  token: 'your-app-token',
+  appKey: 'your-app-key',
   apiKey: 'your-bearer-token',
 });
 ```
@@ -288,7 +288,7 @@ Nadi.init({
 ```javascript
 Nadi.init({
   url: 'https://nadi.example.com',
-  token: 'your-app-token',
+  appKey: 'your-app-key',
   apiKey: 'your-bearer-token',
   release: '2.1.0',
   environment: 'production',
@@ -301,7 +301,7 @@ Nadi.init({
 ```javascript
 Nadi.init({
   url: 'https://nadi-staging.example.com',
-  token: 'your-dev-app-token',
+  appKey: 'your-dev-app-key',
   apiKey: 'your-dev-bearer-token',
   release: '2.1.0-dev',
   environment: 'development',
@@ -315,7 +315,7 @@ Nadi.init({
 ```javascript
 Nadi.init({
   url: 'https://nadi.example.com',
-  token: 'your-app-token',
+  appKey: 'your-app-key',
   apiKey: 'your-bearer-token',
   autoSession: false, // Manually start sessions
   autoVitals: false,  // Manually trigger vitals

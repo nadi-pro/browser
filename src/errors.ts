@@ -1,4 +1,4 @@
-import type { ErrorPayload, Breadcrumb, DeviceInfo } from './types';
+import type { ErrorPayload, Breadcrumb, DeviceInfo, TraceContext } from './types';
 import { send, createHeaders, buildUrl } from './transport';
 import { getPageUrl, getDeviceInfo } from './utils';
 
@@ -12,8 +12,11 @@ export class ErrorTracker {
     apiKey: string;
     token: string;
     apiVersion: string;
+    release?: string;
     getSessionId: () => string | undefined;
     getBreadcrumbs: () => Breadcrumb[];
+    getTraceContext?: () => TraceContext | undefined;
+    maskError?: (message: string, stack?: string) => { message: string; stack?: string };
     onError?: (error: ErrorPayload) => void;
   };
 
@@ -22,8 +25,11 @@ export class ErrorTracker {
     apiKey: string;
     token: string;
     apiVersion?: string;
+    release?: string;
     getSessionId: () => string | undefined;
     getBreadcrumbs: () => Breadcrumb[];
+    getTraceContext?: () => TraceContext | undefined;
+    maskError?: (message: string, stack?: string) => { message: string; stack?: string };
     onError?: (error: ErrorPayload) => void;
   }) {
     this.config = {
@@ -31,8 +37,11 @@ export class ErrorTracker {
       apiKey: config.apiKey,
       token: config.token,
       apiVersion: config.apiVersion || 'v1',
+      release: config.release,
       getSessionId: config.getSessionId,
       getBreadcrumbs: config.getBreadcrumbs,
+      getTraceContext: config.getTraceContext,
+      maskError: config.maskError,
       onError: config.onError,
     };
   }
@@ -163,9 +172,21 @@ export class ErrorTracker {
     type?: string,
     context?: Record<string, unknown>
   ): ErrorPayload {
+    // Apply privacy masking if configured
+    let maskedMessage = message;
+    let maskedStack = stack;
+    if (this.config.maskError) {
+      const masked = this.config.maskError(message, stack);
+      maskedMessage = masked.message;
+      maskedStack = masked.stack;
+    }
+
+    // Get trace context if available
+    const traceContext = this.config.getTraceContext?.();
+
     return {
-      message,
-      stack,
+      message: maskedMessage,
+      stack: maskedStack,
       filename,
       lineno,
       colno,
@@ -174,6 +195,9 @@ export class ErrorTracker {
       pageUrl: getPageUrl(),
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
       breadcrumbs: this.config.getBreadcrumbs(),
+      traceId: traceContext?.traceId,
+      spanId: traceContext?.spanId,
+      release: this.config.release,
       ...(context && { context }),
     };
   }
@@ -210,6 +234,9 @@ export class ErrorTracker {
         page_url: payload.pageUrl,
         user_agent: payload.userAgent,
         breadcrumbs: payload.breadcrumbs,
+        trace_id: payload.traceId,
+        span_id: payload.spanId,
+        release: payload.release,
         device_info: {
           browser: deviceInfo.browser,
           browser_version: deviceInfo.browserVersion,
