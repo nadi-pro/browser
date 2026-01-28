@@ -146,7 +146,8 @@ This means multiple occurrences of the same error are counted but not stored sep
 
 ### Source Maps
 
-For readable stack traces in production, use source maps. The SDK sends raw stack traces - your Nadi instance processes them.
+For readable stack traces in production, use source maps. The SDK sends raw stack traces -
+your Nadi instance processes them.
 
 ### Stack Trace Example
 

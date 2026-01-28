@@ -25,11 +25,13 @@ Integration with Next.js (App Router and Pages Router).
 For any framework, the integration follows this pattern:
 
 ```javascript
+import Nadi from '@nadi-pro/browser';
+
 // 1. Initialize early in app lifecycle
 Nadi.init({
   url: process.env.NADI_URL,
-  appKey: process.env.NADI_APP_KEY,
   apiKey: process.env.NADI_API_KEY,
+  appKey: process.env.NADI_APP_KEY,
   release: process.env.APP_VERSION,
   environment: process.env.NODE_ENV,
 });

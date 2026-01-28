@@ -5,7 +5,7 @@ Guide for integrating the Nadi Browser SDK with Vue applications.
 ## Installation
 
 ```bash
-npm install @nadi/browser
+npm install @nadi-pro/browser
 ```
 
 ## Vue 3 Setup
@@ -16,7 +16,7 @@ Create a Vue plugin for Nadi:
 
 ```javascript
 // src/plugins/nadi.js
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export default {
   install(app, options) {
@@ -76,7 +76,7 @@ app.mount('#app');
 
 ```javascript
 // src/plugins/nadi.js
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export default {
   install(Vue, options) {
@@ -128,7 +128,7 @@ new Vue({
 ```javascript
 // src/composables/useNadi.js
 import { inject } from 'vue';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function useNadi() {
   const nadi = inject('nadi') || Nadi.getInstance();
@@ -238,7 +238,7 @@ Track route changes automatically:
 ```javascript
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -291,7 +291,7 @@ watch(
 ```javascript
 // src/stores/nadi.js
 import { defineStore } from 'pinia';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export const useNadiStore = defineStore('nadi', {
   getters: {

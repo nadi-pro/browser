@@ -16,12 +16,22 @@ Strategies for reducing data volume on high-traffic sites.
 
 Advanced transport configuration and custom implementations.
 
+### [3. Distributed Tracing](03-distributed-tracing.md)
+
+Correlate frontend events with backend traces using W3C Trace Context.
+
+### [4. Privacy](04-privacy.md)
+
+PII detection, masking, and data scrubbing configuration.
+
 ## When to Use Advanced Features
 
 Consider advanced configurations when:
 
 - **High traffic** - Millions of page views per day
 - **Cost optimization** - Reducing API calls
+- **Backend correlation** - Connecting frontend errors to backend traces
+- **Privacy compliance** - GDPR, CCPA, or other data protection requirements
 - **Custom requirements** - Special network or security needs
 - **Performance tuning** - Minimizing SDK overhead
 
@@ -31,8 +41,33 @@ Consider advanced configurations when:
 
 ```javascript
 Nadi.init({
-  // ...
-  sampleRate: 0.1, // 10% of sessions
+  sampleRate: 0.1,  // 10% of sessions
+  alwaysSampleErrors: true,
+  alwaysSampleSlowSessions: true,
+  samplingRules: [
+    { name: 'checkout', rate: 1.0, priority: 10, conditions: { routes: ['/checkout'] } },
+  ],
+});
+```
+
+### Distributed Tracing
+
+```javascript
+Nadi.init({
+  tracingEnabled: true,
+  propagateTraceUrls: ['https://api.example.com'],
+  traceState: 'vendor=value',
+});
+```
+
+### Privacy Masking
+
+```javascript
+Nadi.init({
+  privacyEnabled: true,
+  sensitiveUrlParams: ['token', 'key'],
+  maskingStrategy: 'partial',
+  sensitiveFields: ['ssn', 'credit_card'],
 });
 ```
 
@@ -40,7 +75,6 @@ Nadi.init({
 
 ```javascript
 Nadi.init({
-  // ...
   autoSession: false,
   autoVitals: false,
   autoErrors: false,

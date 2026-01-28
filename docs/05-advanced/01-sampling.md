@@ -10,13 +10,20 @@ For high-traffic applications, collecting data from every user can be:
 - **Overwhelming** - Too much data to analyze
 - **Unnecessary** - Statistical sampling provides accurate insights
 
+The Nadi SDK provides multiple sampling mechanisms:
+
+- **Global sample rate** - Simple percentage-based sampling
+- **Sampling rules** - Condition-based sampling with priorities
+- **Error sampling** - Always capture sessions with errors
+- **Slow session sampling** - Always capture slow sessions
+- **Adaptive sampling** - Dynamic rate based on error rate
+
 ## Sample Rate Configuration
 
 The `sampleRate` option controls Web Vitals collection:
 
 ```javascript
 Nadi.init({
-  // ...
   sampleRate: 0.1, // Collect from 10% of sessions
 });
 ```
@@ -46,7 +53,8 @@ if (shouldSample(config.sampleRate)) {
 }
 ```
 
-> **Note**: Sampling is determined at session start. A sampled session collects all vitals; an unsampled session collects none.
+> **Note**: Sampling is determined at session start. A sampled session collects all vitals;
+> an unsampled session collects none.
 
 ## What Gets Sampled
 
@@ -246,6 +254,212 @@ sampleRate: Math.max(0.0004, desiredRate);
  */
 ```
 
+## Advanced Sampling Rules
+
+Define condition-based sampling rules with priorities.
+
+### Configuration
+
+```javascript
+Nadi.init({
+  sampleRate: 0.1,  // Default: 10%
+
+  samplingRules: [
+    {
+      name: 'checkout-pages',
+      rate: 1.0,      // Always sample checkout
+      priority: 10,   // Higher priority = evaluated first
+      conditions: {
+        routes: ['/checkout', '/payment', '/cart'],
+      },
+    },
+    {
+      name: 'mobile-users',
+      rate: 0.5,      // 50% for mobile
+      priority: 5,
+      conditions: {
+        deviceTypes: ['mobile'],
+      },
+    },
+    {
+      name: 'slow-connections',
+      rate: 0.8,      // 80% for slow connections
+      priority: 5,
+      conditions: {
+        connectionTypes: ['2g', '3g', 'slow-2g'],
+      },
+    },
+  ],
+});
+```
+
+### Rule Conditions
+
+| Condition | Description | Example |
+|-----------|-------------|---------|
+| `routes` | URL path prefixes | `['/checkout', '/api']` |
+| `deviceTypes` | Device categories | `['mobile', 'tablet']` |
+| `connectionTypes` | Network types | `['4g', 'wifi']` |
+
+### Priority System
+
+Rules are evaluated in priority order (highest first):
+
+```javascript
+samplingRules: [
+  { name: 'critical', priority: 100, rate: 1.0, ... },   // Checked first
+  { name: 'important', priority: 50, rate: 0.5, ... },   // Checked second
+  { name: 'default', priority: 1, rate: 0.1, ... },      // Checked last
+]
+```
+
+## Error Sampling
+
+Always capture sessions where errors occur:
+
+```javascript
+Nadi.init({
+  sampleRate: 0.1,           // Normal: 10%
+  alwaysSampleErrors: true,  // Sessions with errors: 100%
+});
+```
+
+### How It Works
+
+1. Session starts with normal sample rate decision
+2. If an error occurs, session is forced to be sampled
+3. All subsequent data for that session is captured
+
+```javascript
+// Manually force sampling
+const nadi = Nadi.getInstance();
+nadi.forceSampleSession();
+```
+
+## Slow Session Sampling
+
+Capture sessions with poor performance:
+
+```javascript
+Nadi.init({
+  sampleRate: 0.1,
+  alwaysSampleSlowSessions: true,
+  slowSessionThresholdMs: 5000,  // Sessions > 5s load time
+});
+```
+
+### Threshold Guidelines
+
+| Threshold | Use Case |
+|-----------|----------|
+| 3000ms | Aggressive: catch most slow sessions |
+| 5000ms | Default: clearly slow experiences |
+| 10000ms | Conservative: only very slow sessions |
+
+## Adaptive Sampling
+
+Automatically adjust sampling based on error rate:
+
+```javascript
+Nadi.init({
+  sampleRate: 0.1,
+  adaptiveSampling: true,
+});
+```
+
+### How It Works
+
+- Error rate increases → Sample rate increases
+- Error rate decreases → Sample rate normalizes
+- Helps capture more data during incidents
+
+## API Methods
+
+### shouldSampleSession()
+
+Check if the current session is being sampled:
+
+```javascript
+const nadi = Nadi.getInstance();
+const isSampled = nadi.shouldSampleSession();
+```
+
+### getSamplingDecision()
+
+Get detailed sampling decision:
+
+```javascript
+const decision = nadi.getSamplingDecision();
+// {
+//   sampled: true,
+//   reason: 'rule:checkout-pages',
+//   rate: 1.0
+// }
+```
+
+### forceSampleSession()
+
+Force the session to be sampled:
+
+```javascript
+// Force sampling for VIP users
+if (user.isVIP) {
+  nadi.forceSampleSession();
+}
+```
+
+## Complete Configuration Example
+
+```javascript
+Nadi.init({
+  url: 'https://nadi.example.com',
+  apiKey: 'your-api-key',
+  appKey: 'your-app-key',
+
+  // Base sampling
+  sampleRate: 0.1,  // 10% default
+
+  // Smart sampling
+  alwaysSampleErrors: true,
+  alwaysSampleSlowSessions: true,
+  slowSessionThresholdMs: 5000,
+  adaptiveSampling: true,
+
+  // Rule-based sampling
+  samplingRules: [
+    // Critical flows: always sample
+    {
+      name: 'conversion-funnel',
+      rate: 1.0,
+      priority: 100,
+      conditions: {
+        routes: ['/checkout', '/payment', '/signup'],
+      },
+    },
+
+    // Mobile users: higher sampling
+    {
+      name: 'mobile',
+      rate: 0.5,
+      priority: 50,
+      conditions: {
+        deviceTypes: ['mobile'],
+      },
+    },
+
+    // API routes: moderate sampling
+    {
+      name: 'api-pages',
+      rate: 0.3,
+      priority: 25,
+      conditions: {
+        routes: ['/api/', '/dashboard/'],
+      },
+    },
+  ],
+});
+```
+
 ## Troubleshooting
 
 ### No Data Appearing
@@ -255,6 +469,7 @@ If no vitals appear, check:
 1. **Sample rate too low** - Increase temporarily
 2. **Session too short** - Vitals need time to collect
 3. **Network issues** - Check browser console
+4. **Check sampling decision** - Use `getSamplingDecision()`
 
 ### Inconsistent Results
 
@@ -264,8 +479,19 @@ If results vary significantly:
 2. **Traffic patterns** - Check time-of-day effects
 3. **Seasonal variations** - Compare same periods
 
+### Rule Not Matching
+
+Debug sampling rules:
+
+```javascript
+const decision = nadi.getSamplingDecision();
+console.log('Sampling decision:', decision);
+// Check 'reason' field to see which rule matched
+```
+
 ## Next Steps
 
 - [Custom Transport](02-custom-transport.md) - Transport configuration
+- [Distributed Tracing](03-distributed-tracing.md) - Backend correlation
 - [Web Vitals](../02-features/02-web-vitals.md) - Vitals details
 - [Configuration](../01-getting-started/03-configuration.md) - All options

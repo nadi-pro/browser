@@ -17,7 +17,7 @@ function getDeviceInfo(): DeviceInfo
 **Example:**
 
 ```javascript
-import { getDeviceInfo } from '@nadi/browser';
+import { getDeviceInfo } from '@nadi-pro/browser';
 
 const device = getDeviceInfo();
 console.log(device);
@@ -56,7 +56,7 @@ function getPageUrl(): string
 **Example:**
 
 ```javascript
-import { getPageUrl } from '@nadi/browser';
+import { getPageUrl } from '@nadi-pro/browser';
 
 const url = getPageUrl();
 // "https://example.com/users/123?tab=settings"
@@ -77,7 +77,7 @@ function getRoutePattern(): string
 **Example:**
 
 ```javascript
-import { getRoutePattern } from '@nadi/browser';
+import { getRoutePattern } from '@nadi-pro/browser';
 
 // URL: https://example.com/users/123/posts/456
 const route = getRoutePattern();
@@ -116,7 +116,7 @@ function getMetricThresholds(metricName: string): {
 **Example:**
 
 ```javascript
-import { getMetricThresholds } from '@nadi/browser';
+import { getMetricThresholds } from '@nadi-pro/browser';
 
 const lcpThresholds = getMetricThresholds('LCP');
 // { good: 2500, poor: 4000 }
@@ -161,7 +161,7 @@ function getMetricRating(
 **Example:**
 
 ```javascript
-import { getMetricRating } from '@nadi/browser';
+import { getMetricRating } from '@nadi-pro/browser';
 
 // LCP examples
 getMetricRating('LCP', 1500);  // "good"
@@ -181,7 +181,7 @@ getMetricRating('CLS', 0.30);  // "poor"
 ### Custom Analytics Integration
 
 ```javascript
-import { getDeviceInfo, getPageUrl, getRoutePattern } from '@nadi/browser';
+import { getDeviceInfo, getPageUrl, getRoutePattern } from '@nadi-pro/browser';
 
 function trackCustomEvent(eventName, data) {
   const enrichedData = {
@@ -199,7 +199,7 @@ function trackCustomEvent(eventName, data) {
 ### Performance Dashboard
 
 ```javascript
-import { getMetricThresholds, getMetricRating } from '@nadi/browser';
+import { getMetricThresholds, getMetricRating } from '@nadi-pro/browser';
 
 function displayVitalStatus(name, value) {
   const thresholds = getMetricThresholds(name);
@@ -230,7 +230,7 @@ const lcpStatus = displayVitalStatus('LCP', 2100);
 ### Device-Specific Logic
 
 ```javascript
-import { getDeviceInfo } from '@nadi/browser';
+import { getDeviceInfo } from '@nadi-pro/browser';
 
 function getOptimalImageSize() {
   const device = getDeviceInfo();
@@ -250,7 +250,7 @@ function getOptimalImageSize() {
 ### Route-Based Error Grouping
 
 ```javascript
-import { getRoutePattern } from '@nadi/browser';
+import { getRoutePattern } from '@nadi-pro/browser';
 
 function getErrorGroup(error) {
   return {
@@ -276,7 +276,7 @@ import {
   getRoutePattern,
   getMetricThresholds,
   getMetricRating,
-} from '@nadi/browser';
+} from '@nadi-pro/browser';
 ```
 
 ## Next Steps

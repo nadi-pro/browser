@@ -25,8 +25,8 @@ static init(config: NadiConfig): Nadi
 ```javascript
 const nadi = Nadi.init({
   url: 'https://nadi.example.com',
-  token: 'your-app-token',
-  apiKey: 'your-bearer-token',
+  apiKey: 'your-sanctum-token',
+  appKey: 'your-application-key',
   release: '1.0.0',
   environment: 'production',
 });
@@ -352,18 +352,288 @@ await nadi.stop();
 
 ---
 
+#### flush()
+
+Flush all collected data immediately.
+
+```typescript
+async flush(): Promise<void>
+```
+
+**Example:**
+
+```javascript
+// Before SPA navigation
+await nadi.flush();
+```
+
+---
+
+### Custom Event Methods
+
+#### trackEvent(name, category?, value?, tags?)
+
+Track a custom event.
+
+```typescript
+trackEvent(
+  name: string,
+  category?: string,
+  value?: number,
+  tags?: Record<string, string>
+): void
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `name` | `string` | Event name |
+| `category` | `string` | Optional category |
+| `value` | `number` | Optional numeric value |
+| `tags` | `Record<string, string>` | Optional key-value tags |
+
+**Example:**
+
+```javascript
+nadi.trackEvent('checkout_completed', 'conversion', 99.99, {
+  plan: 'premium',
+  currency: 'USD',
+});
+```
+
+---
+
+#### trackTiming(name, duration, tags?)
+
+Track a timing event.
+
+```typescript
+trackTiming(
+  name: string,
+  duration: number,
+  tags?: Record<string, string>
+): void
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `name` | `string` | Timing name |
+| `duration` | `number` | Duration in milliseconds |
+| `tags` | `Record<string, string>` | Optional tags |
+
+**Example:**
+
+```javascript
+const start = performance.now();
+await heavyOperation();
+nadi.trackTiming('heavy_operation', performance.now() - start);
+```
+
+---
+
+### Tracing Methods
+
+#### getTraceContext()
+
+Get the current distributed trace context.
+
+```typescript
+getTraceContext(): TraceContext | null
+```
+
+**Returns:** `TraceContext` object or `null` if tracing is disabled.
+
+**Example:**
+
+```javascript
+const context = nadi.getTraceContext();
+// { traceId: '...', spanId: '...', sampled: true }
+```
+
+---
+
+#### getTraceId()
+
+Get the current trace ID.
+
+```typescript
+getTraceId(): string | null
+```
+
+**Returns:** Trace ID string or `null`
+
+---
+
+#### getTraceHeaders(url)
+
+Get W3C Trace Context headers for an outgoing request.
+
+```typescript
+getTraceHeaders(url: string): Record<string, string>
+```
+
+**Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `url` | `string` | Target URL |
+
+**Returns:** Headers object (empty if URL not in propagate list)
+
+**Example:**
+
+```javascript
+const headers = nadi.getTraceHeaders('https://api.example.com/data');
+// { traceparent: '00-traceid-spanid-01', tracestate: '...' }
+
+fetch('https://api.example.com/data', { headers });
+```
+
+---
+
+#### adoptTraceContext(context)
+
+Adopt an existing trace context from server-rendered page.
+
+```typescript
+adoptTraceContext(context: TraceContext): void
+```
+
+**Example:**
+
+```javascript
+// From server-rendered meta tag
+const traceId = document.querySelector('meta[name="trace-id"]')?.content;
+if (traceId) {
+  nadi.adoptTraceContext({
+    traceId,
+    spanId: generateSpanId(),
+    sampled: true,
+  });
+}
+```
+
+---
+
+### Privacy Methods
+
+#### scrubUrl(url)
+
+Remove PII from a URL.
+
+```typescript
+scrubUrl(url: string): string
+```
+
+**Example:**
+
+```javascript
+const scrubbed = nadi.scrubUrl('https://example.com?email=user@test.com');
+// 'https://example.com?email=[REDACTED]'
+```
+
+---
+
+#### maskPII(text)
+
+Mask PII in text.
+
+```typescript
+maskPII(text: string): string
+```
+
+**Example:**
+
+```javascript
+const masked = nadi.maskPII('Contact john@example.com');
+// 'Contact [EMAIL]'
+```
+
+---
+
+#### detectPII(text)
+
+Detect PII presence in text.
+
+```typescript
+detectPII(text: string): { hasPII: boolean; types: string[]; count: number }
+```
+
+**Example:**
+
+```javascript
+const result = nadi.detectPII('Call 555-123-4567 or email test@test.com');
+// { hasPII: true, types: ['phone', 'email'], count: 2 }
+```
+
+---
+
+### Sampling Methods
+
+#### shouldSampleSession()
+
+Check if the current session should be sampled.
+
+```typescript
+shouldSampleSession(): boolean
+```
+
+---
+
+#### getSamplingDecision()
+
+Get the current sampling decision with details.
+
+```typescript
+getSamplingDecision(): { sampled: boolean; reason: string; rate: number } | null
+```
+
+**Example:**
+
+```javascript
+const decision = nadi.getSamplingDecision();
+// { sampled: true, reason: 'error_occurred', rate: 1.0 }
+```
+
+---
+
+#### forceSampleSession()
+
+Force the current session to be sampled.
+
+```typescript
+forceSampleSession(): void
+```
+
+**Example:**
+
+```javascript
+// Force sampling for important users
+if (user.isPremium) {
+  nadi.forceSampleSession();
+}
+```
+
+---
+
 ## Complete Example
 
 ```javascript
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
-// Initialize
+// Initialize with full configuration
 Nadi.init({
   url: 'https://nadi.example.com',
-  token: 'your-app-token',
-  apiKey: 'your-bearer-token',
+  apiKey: 'your-sanctum-token',
+  appKey: 'your-application-key',
   release: '2.1.0',
   environment: 'production',
+  tracingEnabled: true,
+  propagateTraceUrls: ['https://api.example.com'],
+  privacyEnabled: true,
 });
 
 // Get instance
@@ -377,33 +647,50 @@ async function handleLogin(credentials) {
     nadi.addBreadcrumb('custom', 'User logged in', {
       method: 'email',
     });
+    nadi.trackEvent('login_success', 'auth');
     return user;
   } catch (error) {
     await nadi.captureError(error, {
       action: 'login',
     });
+    nadi.trackEvent('login_failed', 'auth');
     throw error;
   }
 }
 
-// Feature tracking
-function trackFeature(name) {
-  nadi.addBreadcrumb('custom', `Feature used: ${name}`);
+// API call with tracing
+async function fetchUserData(userId) {
+  const headers = nadi.getTraceHeaders('https://api.example.com');
+
+  const start = performance.now();
+  const response = await fetch(`https://api.example.com/users/${userId}`, {
+    headers,
+  });
+  nadi.trackTiming('api_fetch_user', performance.now() - start);
+
+  return response.json();
 }
 
 // Error handling
 async function processPayment(data) {
   try {
-    const result = await paymentService.process(data);
-    nadi.addBreadcrumb('custom', 'Payment processed', {
+    nadi.addBreadcrumb('custom', 'Payment started', {
       amount: data.amount,
     });
+
+    const result = await paymentService.process(data);
+
+    nadi.trackEvent('payment_completed', 'conversion', data.amount, {
+      currency: data.currency,
+    });
+
     return result;
   } catch (error) {
     await nadi.captureError(error, {
       action: 'payment',
       amount: data.amount,
     });
+    nadi.trackEvent('payment_failed', 'conversion');
     await nadi.reportCrash();
     throw error;
   }
@@ -411,6 +698,7 @@ async function processPayment(data) {
 
 // Cleanup
 window.addEventListener('beforeunload', async () => {
+  await nadi.flush();
   await nadi.stop();
 });
 ```

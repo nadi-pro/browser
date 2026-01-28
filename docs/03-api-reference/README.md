@@ -4,7 +4,7 @@ Complete API documentation for the Nadi Browser SDK.
 
 ## Overview
 
-The SDK exports a main `Nadi` class and several types and utility functions.
+The SDK exports a main `Nadi` class along with types, managers, and utility functions.
 
 ## Table of Contents
 
@@ -25,12 +25,12 @@ Exported utility functions for advanced usage.
 ### Initialization
 
 ```javascript
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 const nadi = Nadi.init({
   url: 'https://nadi.example.com',
-  token: 'your-app-token',
-  apiKey: 'your-bearer-token',
+  apiKey: 'your-sanctum-token',
+  appKey: 'your-application-key',
 });
 ```
 
@@ -52,7 +52,7 @@ nadi.reportCrash();    // Report a crash
 ### Error Methods
 
 ```javascript
-nadi.captureError(error, context);   // Capture an error
+nadi.captureError(error, context);     // Capture an error
 nadi.captureMessage(message, context); // Capture a message
 ```
 
@@ -71,21 +71,53 @@ nadi.getVitals();   // Get collected metrics
 nadi.flushVitals(); // Send metrics immediately
 ```
 
+### Custom Events
+
+```javascript
+nadi.trackEvent(name, category, value, tags);  // Track custom event
+nadi.trackTiming(name, duration, tags);        // Track timing event
+```
+
+### Distributed Tracing
+
+```javascript
+nadi.getTraceContext();              // Get current trace context
+nadi.getTraceId();                   // Get current trace ID
+nadi.getTraceHeaders(url);           // Get headers for outgoing request
+nadi.adoptTraceContext(context);     // Adopt server-rendered trace
+```
+
+### Privacy
+
+```javascript
+nadi.scrubUrl(url);      // Remove PII from URL
+nadi.maskPII(text);      // Mask PII in text
+nadi.detectPII(text);    // Detect PII presence
+```
+
+### Sampling
+
+```javascript
+nadi.shouldSampleSession();    // Check if session is sampled
+nadi.getSamplingDecision();    // Get sampling decision details
+nadi.forceSampleSession();     // Force session to be sampled
+```
+
 ### Lifecycle
 
 ```javascript
-nadi.stop(); // Stop all collectors
+nadi.flush();  // Flush all pending data
+nadi.stop();   // Stop all collectors
 ```
 
 ## Imports
 
 ```javascript
 // Default import
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
-// Named imports
-import {
-  Nadi,
+// Named imports - Types
+import type {
   NadiConfig,
   Breadcrumb,
   BreadcrumbType,
@@ -94,15 +126,39 @@ import {
   DeviceInfo,
   ErrorPayload,
   VitalsPayload,
+  ResourceEntry,
+  LongTaskEntry,
+  CustomEventEntry,
+  RageClickEntry,
+  NetworkRequestEntry,
+  PageLoadEntry,
+  MemorySampleEntry,
+  UserInteractionEntry,
+  InteractionType,
+  TraceContext,
+  CorrelatedRequest,
+  SamplingRuleConfig,
+} from '@nadi-pro/browser';
+
+// Named imports - Managers
+import {
+  TracingManager,
+  PrivacyManager,
+  SamplingManager,
+} from '@nadi-pro/browser';
+
+// Named imports - Utilities
+import {
   getDeviceInfo,
   getPageUrl,
   getRoutePattern,
   getMetricThresholds,
   getMetricRating,
-} from '@nadi/browser';
+} from '@nadi-pro/browser';
 ```
 
 ## Related Documentation
 
 - [Configuration](../01-getting-started/03-configuration.md) - Config options
 - [Features](../02-features/README.md) - Feature details
+- [Advanced](../05-advanced/README.md) - Tracing, privacy, sampling

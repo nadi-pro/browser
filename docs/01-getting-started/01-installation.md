@@ -7,19 +7,19 @@ This guide covers the different ways to install the Nadi Browser SDK in your pro
 ### npm
 
 ```bash
-npm install @nadi/browser
+npm install @nadi-pro/browser
 ```
 
 ### yarn
 
 ```bash
-yarn add @nadi/browser
+yarn add @nadi-pro/browser
 ```
 
 ### pnpm
 
 ```bash
-pnpm add @nadi/browser
+pnpm add @nadi-pro/browser
 ```
 
 ## CDN
@@ -27,7 +27,7 @@ pnpm add @nadi/browser
 For quick prototyping or non-bundled applications, use the UMD build via CDN:
 
 ```html
-<script src="https://unpkg.com/@nadi/browser/dist/nadi.umd.js"></script>
+<script src="https://unpkg.com/@nadi-pro/browser/dist/nadi.umd.js"></script>
 ```
 
 The SDK will be available globally as `Nadi`:
@@ -59,7 +59,7 @@ Modern bundlers automatically select the correct format based on your import syn
 The SDK includes TypeScript definitions out of the box. No additional `@types` package is required.
 
 ```typescript
-import Nadi, { NadiConfig, VitalMetric } from '@nadi/browser';
+import Nadi, { NadiConfig, VitalMetric } from '@nadi-pro/browser';
 
 const config: NadiConfig = {
   url: 'https://your-nadi-instance.com',
@@ -75,13 +75,13 @@ Nadi.init(config);
 After installation, verify by checking the package in your `node_modules`:
 
 ```bash
-ls node_modules/@nadi/browser
+ls node_modules/@nadi-pro/browser
 ```
 
 Or import and check the version:
 
 ```javascript
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 console.log('Nadi SDK loaded');
 ```
 

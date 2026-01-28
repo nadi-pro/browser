@@ -30,7 +30,8 @@ User Actions
 └─────────────────┘
 ```
 
-Breadcrumbs are stored in a circular buffer (default: 50 items). When an error occurs, recent breadcrumbs are included in the error report.
+Breadcrumbs are stored in a circular buffer (default: 50 items). When an error occurs,
+recent breadcrumbs are included in the error report.
 
 ## Breadcrumb Types
 

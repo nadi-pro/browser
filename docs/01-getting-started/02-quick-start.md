@@ -7,7 +7,7 @@ Get the Nadi Browser SDK running in your application in under 5 minutes.
 ### Step 1: Import the SDK
 
 ```javascript
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 ```
 
 ### Step 2: Initialize
@@ -111,7 +111,7 @@ Web Vitals are sent when the user leaves the page. To test:
 <body>
   <h1>Welcome to My App</h1>
 
-  <script src="https://unpkg.com/@nadi/browser/dist/nadi.umd.js"></script>
+  <script src="https://unpkg.com/@nadi-pro/browser/dist/nadi.umd.js"></script>
   <script>
     // Initialize as early as possible
     Nadi.init({

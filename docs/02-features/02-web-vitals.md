@@ -203,7 +203,7 @@ The SDK uses `navigator.sendBeacon()` for reliable delivery.
 ### Get Metric Thresholds
 
 ```javascript
-import { getMetricThresholds } from '@nadi/browser';
+import { getMetricThresholds } from '@nadi-pro/browser';
 
 const lcpThresholds = getMetricThresholds('LCP');
 // { good: 2500, poor: 4000 }
@@ -212,7 +212,7 @@ const lcpThresholds = getMetricThresholds('LCP');
 ### Get Metric Rating
 
 ```javascript
-import { getMetricRating } from '@nadi/browser';
+import { getMetricRating } from '@nadi-pro/browser';
 
 const rating = getMetricRating('LCP', 1500);
 // "good"

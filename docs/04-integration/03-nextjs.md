@@ -5,7 +5,7 @@ Guide for integrating the Nadi Browser SDK with Next.js applications.
 ## Installation
 
 ```bash
-npm install @nadi/browser
+npm install @nadi-pro/browser
 ```
 
 ## Important: Client-Side Only
@@ -22,7 +22,7 @@ Create a client component for initialization:
 // lib/nadi.ts
 'use client';
 
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 let initialized = false;
 
@@ -92,7 +92,7 @@ export default function RootLayout({
 'use client';
 
 import React from 'react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 interface Props {
   children: React.ReactNode;
@@ -148,7 +148,7 @@ function ErrorFallback({ error }: { error: Error | null }) {
 'use client';
 
 import { useEffect } from 'react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function useNadiUser(userId: string | undefined) {
   useEffect(() => {
@@ -168,7 +168,7 @@ export function useNadiUser(userId: string | undefined) {
 
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function NadiNavigation() {
   const pathname = usePathname();
@@ -228,7 +228,7 @@ export default function RootLayout({
 import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 let nadiInitialized = false;
 
@@ -273,7 +273,7 @@ export default function App({ Component, pageProps }: AppProps) {
 // pages/_error.tsx
 import { useEffect } from 'react';
 import { NextPageContext } from 'next';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 interface Props {
   statusCode: number;
@@ -327,7 +327,7 @@ export default async function DashboardPage() {
 'use client';
 
 import { useEffect } from 'react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function DashboardClient({ data }) {
   useEffect(() => {
@@ -416,7 +416,7 @@ export default function RootLayout({
 
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();

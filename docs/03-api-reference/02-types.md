@@ -11,11 +11,11 @@ interface NadiConfig {
   /** Nadi API endpoint URL */
   url: string;
 
-  /** Application identifier token for authentication */
-  token: string;
-
-  /** Sanctum API key */
+  /** Sanctum personal access token for authentication */
   apiKey: string;
+
+  /** Application token from Nadi dashboard (for Nadi-App-Token header) */
+  appKey: string;
 
   /** API version (default: 'v1') */
   apiVersion?: string;
@@ -49,21 +49,71 @@ interface NadiConfig {
 
   /** Sample rate for Web Vitals (0-1, default: 1.0) */
   sampleRate?: number;
+
+  // Performance tracking
+  /** Enable resource timing tracking (default: true) */
+  resourceTracking?: boolean;
+  /** Resource duration threshold in ms (default: 500) */
+  resourceThresholdMs?: number;
+  /** Enable long task tracking (default: true) */
+  longTaskTracking?: boolean;
+  /** Long task duration threshold in ms (default: 50) */
+  longTaskThresholdMs?: number;
+  /** Enable page load waterfall tracking (default: true) */
+  pageLoadTracking?: boolean;
+
+  // User behavior tracking
+  /** Enable rage click detection (default: true) */
+  rageClickDetection?: boolean;
+  /** Minimum clicks to trigger rage click (default: 3) */
+  rageClickThreshold?: number;
+  /** Time window for rage click detection in ms (default: 1000) */
+  rageClickWindowMs?: number;
+  /** Enable network request tracking (default: true) */
+  networkRequestTracking?: boolean;
+  /** Network request duration threshold in ms (default: 1000) */
+  networkRequestThresholdMs?: number;
+  /** Enable memory tracking - Chrome only (default: false) */
+  memoryTracking?: boolean;
+  /** Memory sample interval in ms (default: 30000) */
+  memorySampleIntervalMs?: number;
+  /** Enable scroll depth tracking (default: false) */
+  scrollDepthTracking?: boolean;
+  /** First-party domains for attribution */
+  firstPartyDomains?: string[];
+
+  // Distributed tracing
+  /** Enable distributed tracing (default: false) */
+  tracingEnabled?: boolean;
+  /** URLs/patterns to propagate trace headers to */
+  propagateTraceUrls?: (string | RegExp)[];
+  /** Custom trace state to include */
+  traceState?: string;
+
+  // Privacy & data masking
+  /** Enable privacy masking (default: true) */
+  privacyEnabled?: boolean;
+  /** URL parameters to always mask */
+  sensitiveUrlParams?: string[];
+  /** Masking strategy: redact, partial, or hash */
+  maskingStrategy?: 'redact' | 'partial' | 'hash';
+  /** Custom PII patterns to detect */
+  customPIIPatterns?: Record<string, RegExp>;
+  /** Fields to always mask in objects */
+  sensitiveFields?: string[];
+
+  // Advanced sampling
+  /** Custom sampling rules */
+  samplingRules?: SamplingRuleConfig[];
+  /** Always sample sessions with errors (default: true) */
+  alwaysSampleErrors?: boolean;
+  /** Always sample slow sessions (default: true) */
+  alwaysSampleSlowSessions?: boolean;
+  /** Threshold in ms to consider a session slow (default: 5000) */
+  slowSessionThresholdMs?: number;
+  /** Enable adaptive sampling based on error rate */
+  adaptiveSampling?: boolean;
 }
-```
-
-**Example:**
-
-```typescript
-import { NadiConfig } from '@nadi/browser';
-
-const config: NadiConfig = {
-  url: 'https://nadi.example.com',
-  token: 'app-token',
-  apiKey: 'bearer-token',
-  release: '1.0.0',
-  environment: 'production',
-};
 ```
 
 ---
@@ -83,8 +133,6 @@ type BreadcrumbType =
   | 'custom';
 ```
 
-**Values:**
-
 | Type | Description |
 |------|-------------|
 | `'click'` | User click events |
@@ -103,34 +151,11 @@ A single breadcrumb entry.
 
 ```typescript
 interface Breadcrumb {
-  /** Breadcrumb type */
   type: BreadcrumbType;
-
-  /** Human-readable message */
   message: string;
-
-  /** Unix timestamp in milliseconds */
   timestamp: number;
-
-  /** Additional contextual data */
   data?: Record<string, unknown>;
 }
-```
-
-**Example:**
-
-```typescript
-import { Breadcrumb } from '@nadi/browser';
-
-const breadcrumb: Breadcrumb = {
-  type: 'custom',
-  message: 'User clicked checkout',
-  timestamp: Date.now(),
-  data: {
-    cartItems: 3,
-    total: 99.99,
-  },
-};
 ```
 
 ---
@@ -141,48 +166,15 @@ Device and browser information.
 
 ```typescript
 interface DeviceInfo {
-  /** Browser name */
   browser: string;
-
-  /** Browser version */
   browserVersion: string;
-
-  /** Operating system */
   os: string;
-
-  /** OS version */
   osVersion: string;
-
-  /** Device category */
   deviceType: 'desktop' | 'mobile' | 'tablet';
-
-  /** Network connection type (if available) */
   connectionType?: string;
-
-  /** Screen width in pixels */
   screenWidth?: number;
-
-  /** Screen height in pixels */
   screenHeight?: number;
 }
-```
-
-**Example:**
-
-```typescript
-import { DeviceInfo, getDeviceInfo } from '@nadi/browser';
-
-const device: DeviceInfo = getDeviceInfo();
-// {
-//   browser: "Chrome",
-//   browserVersion: "120",
-//   os: "macOS",
-//   osVersion: "14.2",
-//   deviceType: "desktop",
-//   connectionType: "4g",
-//   screenWidth: 1920,
-//   screenHeight: 1080
-// }
 ```
 
 ---
@@ -193,41 +185,14 @@ Current session information.
 
 ```typescript
 interface SessionData {
-  /** Unique session identifier */
   sessionId: string;
-
-  /** User identifier (if set) */
   userId?: string;
-
-  /** Persistent device identifier */
   deviceId?: string;
-
-  /** Session start timestamp */
   startedAt: number;
-
-  /** Last activity timestamp */
   lastActivityAt: number;
-
-  /** Application version */
   releaseVersion?: string;
-
-  /** Environment name */
   environment?: string;
-
-  /** Device information */
   deviceInfo: DeviceInfo;
-}
-```
-
-**Example:**
-
-```typescript
-import Nadi, { SessionData } from '@nadi/browser';
-
-const session: SessionData | null = Nadi.getInstance()?.getSession();
-if (session) {
-  console.log(`Session: ${session.sessionId}`);
-  console.log(`Started: ${new Date(session.startedAt)}`);
 }
 ```
 
@@ -239,119 +204,287 @@ A Core Web Vital measurement.
 
 ```typescript
 interface VitalMetric {
-  /** Metric name */
   name: 'LCP' | 'INP' | 'CLS' | 'FCP' | 'TTFB' | 'FID';
-
-  /** Metric value */
   value: number;
-
-  /** Change from previous measurement */
   delta?: number;
-
-  /** Performance rating */
   rating?: 'good' | 'needs-improvement' | 'poor';
 }
 ```
 
-**Example:**
+---
+
+## TraceContext
+
+Distributed tracing context.
 
 ```typescript
-import Nadi, { VitalMetric } from '@nadi/browser';
-
-const vitals: VitalMetric[] = Nadi.getInstance()?.getVitals() || [];
-
-vitals.forEach((vital) => {
-  console.log(`${vital.name}: ${vital.value}ms (${vital.rating})`);
-});
+interface TraceContext {
+  /** 32 hex character trace ID */
+  traceId: string;
+  /** 16 hex character span ID */
+  spanId: string;
+  /** Whether the trace is sampled */
+  sampled: boolean;
+  /** Trace state (vendor-specific key-value pairs) */
+  traceState?: string;
+}
 ```
 
 ---
 
-## VitalsPayload
+## CorrelatedRequest
 
-Payload sent to the server for Web Vitals.
+Request linked to a trace for error correlation.
+
+```typescript
+interface CorrelatedRequest {
+  traceId: string;
+  spanId: string;
+  url: string;
+  method: string;
+  startTime: number;
+  endTime: number;
+  status: number;
+  duration: number;
+}
+```
+
+---
+
+## SamplingRuleConfig
+
+Custom sampling rule configuration.
+
+```typescript
+interface SamplingRuleConfig {
+  name: string;
+  rate: number;
+  priority: number;
+  conditions?: {
+    routes?: string[];
+    deviceTypes?: string[];
+    connectionTypes?: string[];
+  };
+}
+```
+
+---
+
+## ResourceEntry
+
+Resource timing entry.
+
+```typescript
+interface ResourceEntry {
+  url: string;
+  initiatorType: string;
+  duration: number;
+  transferSize?: number;
+  encodedBodySize?: number;
+  decodedBodySize?: number;
+  protocol?: string;
+  dnsLookup?: number;
+  tcpConnect?: number;
+  sslTime?: number;
+  ttfb?: number;
+  contentDownload?: number;
+  cacheHit?: boolean;
+}
+```
+
+---
+
+## LongTaskEntry
+
+Long task detection entry.
+
+```typescript
+interface LongTaskEntry {
+  startTime: number;
+  duration: number;
+  attributionName?: string;
+  attributionType?: string;
+  containerType?: string;
+  containerName?: string;
+}
+```
+
+---
+
+## PageLoadEntry
+
+Page load timing entry.
+
+```typescript
+interface PageLoadEntry {
+  navigationType?: string;
+  dnsLookup?: number;
+  tcpConnect?: number;
+  sslTime?: number;
+  ttfb?: number;
+  responseTime?: number;
+  domInteractive?: number;
+  domContentLoaded?: number;
+  domComplete?: number;
+  loadEvent?: number;
+  totalLoadTime?: number;
+  resourceCount?: number;
+  scriptCount?: number;
+  stylesheetCount?: number;
+  imageCount?: number;
+  totalTransferSize?: number;
+  deviceType?: string;
+  connectionType?: string;
+}
+```
+
+---
+
+## RageClickEntry
+
+Rage click detection entry.
+
+```typescript
+interface RageClickEntry {
+  selector?: string;
+  tagName?: string;
+  elementId?: string;
+  elementClass?: string;
+  elementText?: string;
+  clickCount: number;
+  windowMs: number;
+  xPosition?: number;
+  yPosition?: number;
+}
+```
+
+---
+
+## NetworkRequestEntry
+
+Network request tracking entry.
+
+```typescript
+interface NetworkRequestEntry {
+  url: string;
+  method: string;
+  statusCode?: number;
+  duration: number;
+  ttfb?: number;
+  requestSize?: number;
+  responseSize?: number;
+  contentType?: string;
+  isError?: boolean;
+  errorMessage?: string;
+  isFirstParty?: boolean;
+}
+```
+
+---
+
+## MemorySampleEntry
+
+Memory monitoring entry (Chrome only).
+
+```typescript
+interface MemorySampleEntry {
+  usedJSHeapSize?: number;
+  totalJSHeapSize?: number;
+  jsHeapSizeLimit?: number;
+  heapUsagePercent?: number;
+  sampleIndex?: number;
+}
+```
+
+---
+
+## CustomEventEntry
+
+Custom event entry.
+
+```typescript
+interface CustomEventEntry {
+  name: string;
+  category?: string;
+  value?: number;
+  duration?: number;
+  tags?: Record<string, string>;
+  metadata?: Record<string, unknown>;
+}
+```
+
+---
+
+## InteractionType
+
+User interaction type.
+
+```typescript
+type InteractionType = 'scroll' | 'form' | 'visibility';
+```
+
+---
+
+## UserInteractionEntry
+
+User interaction tracking entry.
+
+```typescript
+interface UserInteractionEntry {
+  type: InteractionType;
+  maxScrollDepth?: number;
+  scrollDistancePx?: number;
+  formId?: string;
+  formName?: string;
+  formInteractionTime?: number;
+  formSubmitted?: boolean;
+  formFieldCount?: number;
+  elementSelector?: string;
+  timeToVisible?: number;
+  timeVisible?: number;
+  visibilityPercent?: number;
+  metadata?: Record<string, unknown>;
+}
+```
+
+---
+
+## Payload Types
+
+### VitalsPayload
 
 ```typescript
 interface VitalsPayload {
-  /** Array of collected metrics */
   metrics: VitalMetric[];
-
-  /** Session identifier */
   sessionId?: string;
-
-  /** Full page URL */
   pageUrl: string;
-
-  /** Normalized route pattern */
   route?: string;
-
-  /** Device information */
   deviceInfo?: Partial<DeviceInfo>;
-
-  /** User's country code */
   countryCode?: string;
+  traceId?: string;
+  spanId?: string;
 }
 ```
 
----
-
-## ErrorPayload
-
-Payload sent to the server for errors.
+### ErrorPayload
 
 ```typescript
 interface ErrorPayload {
-  /** Error message */
   message: string;
-
-  /** Stack trace */
   stack?: string;
-
-  /** Source file URL */
   filename?: string;
-
-  /** Line number */
   lineno?: number;
-
-  /** Column number */
   colno?: number;
-
-  /** Error type (e.g., "TypeError") */
   type?: string;
-
-  /** Session identifier */
+  runtime?: string;
   sessionId?: string;
-
-  /** Page URL where error occurred */
   pageUrl: string;
-
-  /** Browser user agent string */
   userAgent: string;
-
-  /** Recent user actions */
   breadcrumbs: Breadcrumb[];
-}
-```
-
----
-
-## TransportOptions
-
-Options for HTTP transport (internal use).
-
-```typescript
-interface TransportOptions {
-  /** Target URL */
-  url: string;
-
-  /** HTTP headers */
-  headers: Record<string, string>;
-
-  /** Request body */
-  data: unknown;
-
-  /** Use sendBeacon instead of fetch */
-  useBeacon?: boolean;
+  traceId?: string;
+  spanId?: string;
+  release?: string;
+  correlatedRequests?: CorrelatedRequest[];
 }
 ```
 
@@ -367,9 +500,21 @@ import type {
   SessionData,
   VitalMetric,
   DeviceInfo,
+  TraceContext,
+  CorrelatedRequest,
+  SamplingRuleConfig,
+  ResourceEntry,
+  LongTaskEntry,
+  PageLoadEntry,
+  RageClickEntry,
+  NetworkRequestEntry,
+  MemorySampleEntry,
+  CustomEventEntry,
+  InteractionType,
+  UserInteractionEntry,
   ErrorPayload,
   VitalsPayload,
-} from '@nadi/browser';
+} from '@nadi-pro/browser';
 ```
 
 ## Next Steps

@@ -5,7 +5,7 @@ Guide for integrating the Nadi Browser SDK with React applications.
 ## Installation
 
 ```bash
-npm install @nadi/browser
+npm install @nadi-pro/browser
 ```
 
 ## Basic Setup
@@ -16,7 +16,7 @@ Create a file for Nadi initialization:
 
 ```javascript
 // src/lib/nadi.js
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 let initialized = false;
 
@@ -59,7 +59,7 @@ root.render(<App />);
 
 ```javascript
 // src/lib/nadi.js
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function initNadi() {
   Nadi.init({
@@ -79,7 +79,7 @@ Create an Error Boundary to capture React errors:
 ```jsx
 // src/components/ErrorBoundary.jsx
 import React from 'react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -145,7 +145,7 @@ Create a hook for user management:
 ```javascript
 // src/hooks/useNadiUser.js
 import { useEffect } from 'react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function useNadiUser(user) {
   useEffect(() => {
@@ -177,7 +177,7 @@ function App() {
 ```javascript
 // src/hooks/useNadiBreadcrumb.js
 import { useCallback } from 'react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function useNadiBreadcrumb() {
   return useCallback((type, message, data) => {
@@ -218,7 +218,7 @@ Track route changes with React Router:
 // src/components/NadiRouteTracker.jsx
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 export function NadiRouteTracker() {
   const location = useLocation();
@@ -259,7 +259,7 @@ For advanced usage, create a context:
 ```jsx
 // src/context/NadiContext.jsx
 import React, { createContext, useContext, useMemo } from 'react';
-import Nadi from '@nadi/browser';
+import Nadi from '@nadi-pro/browser';
 
 const NadiContext = createContext(null);
 

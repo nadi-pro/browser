@@ -8,21 +8,60 @@ Complete reference for all configuration options available when initializing the
 interface NadiConfig {
   // Required
   url: string;
-  appKey: string;
   apiKey: string;
+  appKey: string;
 
-  // Optional
+  // Core Options
   apiVersion?: string;
   debug?: boolean;
+  release?: string;
+  environment?: string;
+
+  // Auto-tracking Options
   autoSession?: boolean;
   autoVitals?: boolean;
   autoErrors?: boolean;
   autoBreadcrumbs?: boolean;
   maxBreadcrumbs?: number;
   sessionTimeout?: number;
-  release?: string;
-  environment?: string;
   sampleRate?: number;
+
+  // Performance Tracking
+  resourceTracking?: boolean;
+  resourceThresholdMs?: number;
+  longTaskTracking?: boolean;
+  longTaskThresholdMs?: number;
+  pageLoadTracking?: boolean;
+
+  // User Behavior Tracking
+  rageClickDetection?: boolean;
+  rageClickThreshold?: number;
+  rageClickWindowMs?: number;
+  networkRequestTracking?: boolean;
+  networkRequestThresholdMs?: number;
+  memoryTracking?: boolean;
+  memorySampleIntervalMs?: number;
+  scrollDepthTracking?: boolean;
+  firstPartyDomains?: string[];
+
+  // Distributed Tracing
+  tracingEnabled?: boolean;
+  propagateTraceUrls?: (string | RegExp)[];
+  traceState?: string;
+
+  // Privacy & Data Masking
+  privacyEnabled?: boolean;
+  sensitiveUrlParams?: string[];
+  maskingStrategy?: 'redact' | 'partial' | 'hash';
+  customPIIPatterns?: Record<string, RegExp>;
+  sensitiveFields?: string[];
+
+  // Advanced Sampling
+  samplingRules?: SamplingRuleConfig[];
+  alwaysSampleErrors?: boolean;
+  alwaysSampleSlowSessions?: boolean;
+  slowSessionThresholdMs?: number;
+  adaptiveSampling?: boolean;
 }
 ```
 
@@ -47,7 +86,8 @@ Nadi.init({
 - **Type**: `string`
 - **Required**: Yes
 
-Your application key from the Nadi dashboard. Used to identify which application is sending data (sent as `Nadi-App-Token` header).
+Your application key from the Nadi dashboard. Used to identify which application is sending
+data (sent as `Nadi-App-Token` header).
 
 ```javascript
 Nadi.init({
@@ -226,6 +266,276 @@ Nadi.init({
 });
 ```
 
+## Performance Tracking Options
+
+### resourceTracking
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Enable tracking of slow resources (scripts, stylesheets, images).
+
+### resourceThresholdMs
+
+- **Type**: `number`
+- **Default**: `500`
+
+Minimum resource duration in milliseconds to track.
+
+### longTaskTracking
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Enable detection of long tasks that block the main thread.
+
+### longTaskThresholdMs
+
+- **Type**: `number`
+- **Default**: `50`
+
+Minimum task duration in milliseconds to consider as a long task.
+
+### pageLoadTracking
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Enable page load waterfall tracking with timing breakdown.
+
+```javascript
+Nadi.init({
+  resourceTracking: true,
+  resourceThresholdMs: 300,     // Track resources taking > 300ms
+  longTaskTracking: true,
+  longTaskThresholdMs: 100,     // Track tasks blocking > 100ms
+  pageLoadTracking: true,
+  // ...
+});
+```
+
+## User Behavior Tracking Options
+
+### rageClickDetection
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Enable detection of rage clicks (rapid repeated clicks indicating frustration).
+
+### rageClickThreshold
+
+- **Type**: `number`
+- **Default**: `3`
+
+Minimum number of clicks to trigger rage click detection.
+
+### rageClickWindowMs
+
+- **Type**: `number`
+- **Default**: `1000`
+
+Time window in milliseconds for rage click detection.
+
+### scrollDepthTracking
+
+- **Type**: `boolean`
+- **Default**: `false`
+
+Enable scroll depth tracking for engagement metrics.
+
+### memoryTracking
+
+- **Type**: `boolean`
+- **Default**: `false`
+
+Enable JavaScript heap memory monitoring (Chrome only).
+
+### memorySampleIntervalMs
+
+- **Type**: `number`
+- **Default**: `30000`
+
+Interval in milliseconds between memory samples.
+
+### networkRequestTracking
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Enable tracking of network requests (fetch/XHR).
+
+### networkRequestThresholdMs
+
+- **Type**: `number`
+- **Default**: `1000`
+
+Minimum request duration in milliseconds to track.
+
+### firstPartyDomains
+
+- **Type**: `string[]`
+- **Default**: `[]`
+
+List of first-party domains for attribution in network requests.
+
+```javascript
+Nadi.init({
+  rageClickDetection: true,
+  rageClickThreshold: 5,
+  scrollDepthTracking: true,
+  memoryTracking: true,
+  firstPartyDomains: ['api.example.com', 'cdn.example.com'],
+  // ...
+});
+```
+
+## Distributed Tracing Options
+
+### tracingEnabled
+
+- **Type**: `boolean`
+- **Default**: `false`
+
+Enable distributed tracing with W3C Trace Context headers.
+
+### propagateTraceUrls
+
+- **Type**: `(string | RegExp)[]`
+- **Default**: `[]`
+
+URLs or patterns to propagate trace headers to.
+
+### traceState
+
+- **Type**: `string`
+- **Default**: `''`
+
+Custom trace state string to include in headers.
+
+```javascript
+Nadi.init({
+  tracingEnabled: true,
+  propagateTraceUrls: [
+    'https://api.example.com',
+    /^https:\/\/.*\.example\.com/,
+  ],
+  traceState: 'vendor=value',
+  // ...
+});
+```
+
+## Privacy Options
+
+### privacyEnabled
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Enable automatic PII detection and masking.
+
+### sensitiveUrlParams
+
+- **Type**: `string[]`
+- **Default**: `[]`
+
+URL parameters to always mask (e.g., `token`, `key`).
+
+### maskingStrategy
+
+- **Type**: `'redact' | 'partial' | 'hash'`
+- **Default**: `'redact'`
+
+Strategy for masking detected PII.
+
+### sensitiveFields
+
+- **Type**: `string[]`
+- **Default**: `[]`
+
+Object field names to always mask.
+
+### customPIIPatterns
+
+- **Type**: `Record<string, RegExp>`
+- **Default**: `{}`
+
+Custom regex patterns for PII detection.
+
+```javascript
+Nadi.init({
+  privacyEnabled: true,
+  sensitiveUrlParams: ['token', 'secret', 'api_key'],
+  maskingStrategy: 'partial',
+  sensitiveFields: ['ssn', 'credit_card'],
+  customPIIPatterns: {
+    employeeId: /EMP-\d{6}/g,
+  },
+  // ...
+});
+```
+
+## Advanced Sampling Options
+
+### samplingRules
+
+- **Type**: `SamplingRuleConfig[]`
+- **Default**: `undefined`
+
+Custom sampling rules with conditions and priorities.
+
+### alwaysSampleErrors
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Force sampling for sessions with errors.
+
+### alwaysSampleSlowSessions
+
+- **Type**: `boolean`
+- **Default**: `true`
+
+Force sampling for slow sessions.
+
+### slowSessionThresholdMs
+
+- **Type**: `number`
+- **Default**: `5000`
+
+Threshold in milliseconds to consider a session slow.
+
+### adaptiveSampling
+
+- **Type**: `boolean`
+- **Default**: `false`
+
+Enable adaptive sampling based on error rate.
+
+```javascript
+Nadi.init({
+  sampleRate: 0.1,
+  samplingRules: [
+    {
+      name: 'checkout-pages',
+      rate: 1.0,  // Always sample checkout
+      priority: 10,
+      conditions: { routes: ['/checkout', '/payment'] },
+    },
+    {
+      name: 'mobile-users',
+      rate: 0.5,
+      priority: 5,
+      conditions: { deviceTypes: ['mobile'] },
+    },
+  ],
+  alwaysSampleErrors: true,
+  alwaysSampleSlowSessions: true,
+  slowSessionThresholdMs: 3000,
+  // ...
+});
+```
+
 ## Environment Variables
 
 A common pattern is to use environment variables for configuration:
@@ -324,8 +634,48 @@ Nadi.init({
 });
 ```
 
+### Full-Featured Configuration
+
+```javascript
+Nadi.init({
+  url: 'https://nadi.example.com',
+  apiKey: 'your-bearer-token',
+  appKey: 'your-app-key',
+  release: '2.1.0',
+  environment: 'production',
+
+  // Performance
+  resourceTracking: true,
+  resourceThresholdMs: 300,
+  longTaskTracking: true,
+  pageLoadTracking: true,
+
+  // User behavior
+  rageClickDetection: true,
+  scrollDepthTracking: true,
+  memoryTracking: true,
+  firstPartyDomains: ['api.example.com'],
+
+  // Distributed tracing
+  tracingEnabled: true,
+  propagateTraceUrls: ['https://api.example.com'],
+
+  // Privacy
+  privacyEnabled: true,
+  sensitiveUrlParams: ['token', 'key'],
+  maskingStrategy: 'partial',
+
+  // Sampling
+  sampleRate: 0.1,
+  alwaysSampleErrors: true,
+  alwaysSampleSlowSessions: true,
+});
+```
+
 ## Next Steps
 
 - [Session Tracking](../02-features/01-session-tracking.md) - Configure sessions
 - [Web Vitals](../02-features/02-web-vitals.md) - Configure metrics
 - [Sampling](../05-advanced/01-sampling.md) - Advanced sampling strategies
+- [Distributed Tracing](../05-advanced/03-distributed-tracing.md) - Backend correlation
+- [Privacy](../05-advanced/04-privacy.md) - PII masking configuration
