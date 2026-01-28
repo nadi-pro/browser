@@ -236,6 +236,8 @@ export interface ErrorPayload {
   lineno?: number;
   colno?: number;
   type?: string;
+  /** Runtime environment (javascript, nodejs, etc.) */
+  runtime?: string;
   sessionId?: string;
   pageUrl: string;
   userAgent: string;
