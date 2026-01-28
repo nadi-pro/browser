@@ -12,7 +12,7 @@ export class ResourceCollector {
   private config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion: string;
     thresholdMs: number;
     getSessionId: () => string | undefined;
@@ -21,7 +21,7 @@ export class ResourceCollector {
   constructor(config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion?: string;
     thresholdMs?: number;
     getSessionId: () => string | undefined;
@@ -29,7 +29,7 @@ export class ResourceCollector {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       thresholdMs: config.thresholdMs ?? 500,
       getSessionId: config.getSessionId,
@@ -167,7 +167,7 @@ export class ResourceCollector {
     const url = buildUrl(this.config.url, '/rum/resources');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 

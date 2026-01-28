@@ -61,7 +61,7 @@ export class Nadi {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       debug: config.debug || false,
       autoSession: config.autoSession ?? true,
@@ -162,7 +162,7 @@ export class Nadi {
     this.session = new SessionManager({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       timeout: this.config.sessionTimeout,
       release: this.config.release,
@@ -172,7 +172,7 @@ export class Nadi {
     this.vitals = new VitalsCollector({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       sampleRate: this.config.sampleRate,
       getSessionId: () => this.session.getSessionId(),
@@ -181,7 +181,7 @@ export class Nadi {
     this.errors = new ErrorTracker({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       release: this.config.release,
       getSessionId: () => this.session.getSessionId(),
@@ -198,7 +198,7 @@ export class Nadi {
     this.resources = new ResourceCollector({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       thresholdMs: this.config.resourceThresholdMs,
       getSessionId: () => this.session.getSessionId(),
@@ -207,7 +207,7 @@ export class Nadi {
     this.longTasks = new LongTaskCollector({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       thresholdMs: this.config.longTaskThresholdMs,
       getSessionId: () => this.session.getSessionId(),
@@ -216,7 +216,7 @@ export class Nadi {
     this.pageLoad = new PageLoadCollector({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       getSessionId: () => this.session.getSessionId(),
     });
@@ -224,7 +224,7 @@ export class Nadi {
     this.memory = new MemoryCollector({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       sampleIntervalMs: this.config.memorySampleIntervalMs,
       getSessionId: () => this.session.getSessionId(),
@@ -233,7 +233,7 @@ export class Nadi {
     this.interactions = new InteractionsCollector({
       url: this.config.url,
       apiKey: this.config.apiKey,
-      token: this.config.token,
+      appKey: this.config.appKey,
       apiVersion: this.config.apiVersion,
       rageClickThreshold: this.config.rageClickThreshold,
       rageClickWindowMs: this.config.rageClickWindowMs,
@@ -274,8 +274,8 @@ export class Nadi {
       throw new Error('[Nadi] Configuration error: "apiKey" is required and must be a non-empty string');
     }
 
-    if (!config.token || typeof config.token !== 'string' || config.token.trim() === '' || config.token === 'undefined') {
-      throw new Error('[Nadi] Configuration error: "token" is required and must be a valid application token from the Nadi dashboard');
+    if (!config.appKey || typeof config.appKey !== 'string' || config.appKey.trim() === '' || config.appKey === 'undefined') {
+      throw new Error('[Nadi] Configuration error: "appKey" is required and must be a valid application token from the Nadi dashboard');
     }
   }
 

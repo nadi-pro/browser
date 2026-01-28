@@ -22,7 +22,7 @@ export class InteractionsCollector {
   private config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion: string;
     rageClickThreshold: number;
     rageClickWindowMs: number;
@@ -33,7 +33,7 @@ export class InteractionsCollector {
   constructor(config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion?: string;
     rageClickThreshold?: number;
     rageClickWindowMs?: number;
@@ -43,7 +43,7 @@ export class InteractionsCollector {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       rageClickThreshold: config.rageClickThreshold ?? 3,
       rageClickWindowMs: config.rageClickWindowMs ?? 1000,
@@ -207,7 +207,7 @@ export class InteractionsCollector {
     const url = buildUrl(this.config.url, '/rum/rage-clicks');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 
@@ -244,7 +244,7 @@ export class InteractionsCollector {
     const url = buildUrl(this.config.url, '/rum/interactions');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 
@@ -267,7 +267,7 @@ export class InteractionsCollector {
     const url = buildUrl(this.config.url, '/rum/events');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 

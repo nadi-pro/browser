@@ -10,7 +10,7 @@ export class ErrorTracker {
   private config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion: string;
     release?: string;
     getSessionId: () => string | undefined;
@@ -23,7 +23,7 @@ export class ErrorTracker {
   constructor(config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion?: string;
     release?: string;
     getSessionId: () => string | undefined;
@@ -35,7 +35,7 @@ export class ErrorTracker {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       release: config.release,
       getSessionId: config.getSessionId,
@@ -214,7 +214,7 @@ export class ErrorTracker {
     const url = buildUrl(this.config.url, '/rum/errors');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 

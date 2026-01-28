@@ -60,8 +60,8 @@ export interface NadiConfig {
   url: string;
   /** Sanctum personal access token for authentication */
   apiKey: string;
-  /** Application identifier token from Nadi dashboard */
-  token: string;
+  /** Application token from Nadi dashboard (for Nadi-App-Token header) */
+  appKey: string;
   /** API version (default: 'v1') */
   apiVersion?: string;
   /** Enable debug logging */

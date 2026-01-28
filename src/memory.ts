@@ -13,7 +13,7 @@ export class MemoryCollector {
   private config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion: string;
     sampleIntervalMs: number;
     getSessionId: () => string | undefined;
@@ -22,7 +22,7 @@ export class MemoryCollector {
   constructor(config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion?: string;
     sampleIntervalMs?: number;
     getSessionId: () => string | undefined;
@@ -30,7 +30,7 @@ export class MemoryCollector {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       sampleIntervalMs: config.sampleIntervalMs ?? 30000,
       getSessionId: config.getSessionId,
@@ -160,7 +160,7 @@ export class MemoryCollector {
     const url = buildUrl(this.config.url, '/rum/memory');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 

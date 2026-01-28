@@ -11,7 +11,7 @@ export class PageLoadCollector {
   private config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion: string;
     getSessionId: () => string | undefined;
   };
@@ -19,14 +19,14 @@ export class PageLoadCollector {
   constructor(config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion?: string;
     getSessionId: () => string | undefined;
   }) {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       getSessionId: config.getSessionId,
     };
@@ -203,7 +203,7 @@ export class PageLoadCollector {
     const url = buildUrl(this.config.url, '/rum/pageloads');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 

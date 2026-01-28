@@ -14,7 +14,7 @@ export class VitalsCollector {
   private config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion: string;
     sampleRate: number;
     getSessionId: () => string | undefined;
@@ -23,7 +23,7 @@ export class VitalsCollector {
   constructor(config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion?: string;
     sampleRate?: number;
     getSessionId: () => string | undefined;
@@ -31,7 +31,7 @@ export class VitalsCollector {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       sampleRate: config.sampleRate ?? 1.0,
       getSessionId: config.getSessionId,
@@ -147,7 +147,7 @@ export class VitalsCollector {
     const url = buildUrl(this.config.url, '/rum/vitals');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 

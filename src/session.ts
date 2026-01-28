@@ -11,7 +11,7 @@ export class SessionManager {
   private config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion: string;
     timeout: number;
     release?: string;
@@ -21,7 +21,7 @@ export class SessionManager {
   constructor(config: {
     url: string;
     apiKey: string;
-    token: string;
+    appKey: string;
     apiVersion?: string;
     timeout?: number;
     release?: string;
@@ -30,7 +30,7 @@ export class SessionManager {
     this.config = {
       url: config.url,
       apiKey: config.apiKey,
-      token: config.token,
+      appKey: config.appKey,
       apiVersion: config.apiVersion || 'v1',
       timeout: (config.timeout || 30) * 60 * 1000, // Convert minutes to ms
       release: config.release,
@@ -137,7 +137,7 @@ export class SessionManager {
     const url = buildUrl(this.config.url, '/sessions/start');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 
@@ -167,7 +167,7 @@ export class SessionManager {
     const url = buildUrl(this.config.url, '/sessions/end');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 
@@ -190,7 +190,7 @@ export class SessionManager {
     const url = buildUrl(this.config.url, '/sessions/crash');
     const headers = createHeaders(
       this.config.apiKey,
-      this.config.token,
+      this.config.appKey,
       this.config.apiVersion
     );
 
