@@ -253,9 +253,30 @@ export class Nadi {
       return Nadi.instance;
     }
 
+    // Validate required configuration
+    Nadi.validateConfig(config);
+
     Nadi.instance = new Nadi(config);
     Nadi.instance.start();
     return Nadi.instance;
+  }
+
+  /**
+   * Validate SDK configuration
+   * @throws Error if configuration is invalid
+   */
+  private static validateConfig(config: NadiConfig): void {
+    if (!config.url || typeof config.url !== 'string' || config.url.trim() === '') {
+      throw new Error('[Nadi] Configuration error: "url" is required and must be a non-empty string');
+    }
+
+    if (!config.apiKey || typeof config.apiKey !== 'string' || config.apiKey.trim() === '') {
+      throw new Error('[Nadi] Configuration error: "apiKey" is required and must be a non-empty string');
+    }
+
+    if (!config.token || typeof config.token !== 'string' || config.token.trim() === '' || config.token === 'undefined') {
+      throw new Error('[Nadi] Configuration error: "token" is required and must be a valid application token from the Nadi dashboard');
+    }
   }
 
   /**

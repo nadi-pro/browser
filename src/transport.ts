@@ -34,12 +34,21 @@ export function send(options: TransportOptions): Promise<boolean> {
  * @param apiKey - Sanctum personal access token for authentication
  * @param token - Application identifier token from Nadi dashboard
  * @param apiVersion - API version (default: 'v1')
+ * @throws Error if apiKey or token is invalid
  */
 export function createHeaders(
   apiKey: string,
   token: string,
   apiVersion: string = 'v1'
 ): Record<string, string> {
+  // Defensive validation to catch misconfiguration early
+  if (!apiKey || apiKey === 'undefined' || apiKey === 'null') {
+    throw new Error('[Nadi] Cannot create request headers: apiKey is missing or invalid');
+  }
+  if (!token || token === 'undefined' || token === 'null') {
+    throw new Error('[Nadi] Cannot create request headers: token is missing or invalid');
+  }
+
   return {
     Authorization: `Bearer ${apiKey}`,
     'Nadi-App-Token': token,
