@@ -17,7 +17,7 @@ Add this code as early as possible in your application (before any user interact
 ```javascript
 Nadi.init({
   url: 'https://your-nadi-instance.com',
-  token: 'your-app-token',
+  appKey: 'your-app-token',
   apiKey: 'your-bearer-token',
   release: '1.0.0',
   environment: 'production',
@@ -64,7 +64,7 @@ Enable debug mode to see SDK activity in the console:
 ```javascript
 Nadi.init({
   url: 'https://your-nadi-instance.com',
-  token: 'your-app-token',
+  appKey: 'your-app-token',
   apiKey: 'your-bearer-token',
   debug: true, // Enable debug logging
 });
@@ -116,7 +116,7 @@ Web Vitals are sent when the user leaves the page. To test:
     // Initialize as early as possible
     Nadi.init({
       url: 'https://your-nadi-instance.com',
-      token: 'your-app-token',
+      appKey: 'your-app-token',
       apiKey: 'your-bearer-token',
       release: '1.0.0',
       environment: 'production',

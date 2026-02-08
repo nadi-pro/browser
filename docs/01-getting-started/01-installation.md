@@ -36,7 +36,7 @@ The SDK will be available globally as `Nadi`:
 <script>
   Nadi.init({
     url: 'https://your-nadi-instance.com',
-    token: 'your-app-token',
+    appKey: 'your-app-token',
     apiKey: 'your-bearer-token',
   });
 </script>
